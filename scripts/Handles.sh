@@ -4,8 +4,8 @@ HOMEPROXY_DIR="./feeds/luci/applications/luci-app-homeproxy"
 DNS_CONFIG_FILE="${HOMEPROXY_DIR}/root/etc/config/homeproxy"
 
 if [ ! -d "${HOMEPROXY_DIR}" ]; then
-    echo "错误：luci-app-homeproxy 目录不存在！"
-    exit 1
+    echo "⚠️  警告：luci-app-homeproxy 目录不存在！"
+    exit 0
 fi
 
 echo "开始处理 homeproxy 规则和 DNS 配置..."
