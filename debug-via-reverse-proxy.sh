@@ -31,7 +31,7 @@ echo "$OPENWRT_PATH/custom_release_notes.txt 写你的自定义发布说明"
 echo "echo $OPENWRT_PATH/custom_release_notes.txt 写你的自定义发布说明" >> ~/.bash_profile
 
 # 定义目标源码路径 (根据你提供的容器路径)
-TARGET_PATH="/home/runner/work/openwrt-ci/openwrt-ci/openwrt"
+TARGET_PATH="/home/runner/work/Actions-immortalwrt/Actions-immortalwrt/openwrt"
 echo "Enter source code directory: $TARGET_PATH"
 
 # 写入自动化逻辑到 .bash_profile
@@ -40,7 +40,7 @@ cat << 'EOF' >> ~/.bash_profile
 if [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_CLIENT" ]; then
     if [ "$PWD" = "$HOME" ]; then
         # 这里的路径会自动替换为上面定义的变量值
-        SOURCE_DIR="/home/runner/work/openwrt-ci/openwrt-ci/openwrt"
+        SOURCE_DIR="/home/runner/work/Actions-immortalwrt/Actions-immortalwrt/openwrt"
         if [ -d "$SOURCE_DIR" ]; then
             cd "$SOURCE_DIR"
             echo -e "\033[32m[Cpolar Debug] 已自动跳转至源码目录: $SOURCE_DIR\033[0m"
@@ -53,7 +53,7 @@ EOF
 # 一键进入 menuconfig
 cat << 'EOF' >> ~/.bash_profile
 enter_menuconfig() {
-    local target="/home/runner/work/openwrt-ci/openwrt-ci/openwrt"
+    local target="/home/runner/work/Actions-immortalwrt/Actions-immortalwrt/openwrt"
     cd "$target"
 EOF
 echo "    tmux new-session -A -s config \"make MENUCONFIG_COLOR=$MENUCONFIG_COLOR menuconfig\"" >> ~/.bash_profile
