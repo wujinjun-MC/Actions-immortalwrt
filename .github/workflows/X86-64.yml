@@ -29,7 +29,7 @@ on:
       menuconfig_color:
         description: 'make menuconfig 配色。默认 bluetitle (蓝白配色)，可选 blackbg (夜间模式)'
         required: true
-        default: 'blackbg'
+        default: 'bluetitle'
         type: choice
         options:
           - mono
