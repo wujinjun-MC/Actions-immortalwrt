@@ -103,12 +103,6 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         printf "TIMESTAMP_START=%(%s)T" >> $GITHUB_ENV
 
-    # 1. 在初始化环境前，如果选择了 debug 模式，先启动隧道（非阻塞模式）
-    - name: Remote debug (Startup)
-      if: env.CPOLAR == 'debug'
-      shell: bash
-      run: bash ${GITHUB_WORKSPACE}/debug-via-reverse-proxy.sh nonblock
-
     - name: Check Server Performance(检查服务器性能)
       run: |
         echo "警告⚠"
@@ -164,6 +158,12 @@ jobs:
 
     - name: 检查代码
       uses: actions/checkout@main
+
+    # 1. 如果选择了 debug 模式，先启动隧道（非阻塞模式）
+    - name: Remote debug (Startup)
+      if: env.CPOLAR == 'debug'
+      shell: bash
+      run: bash ${GITHUB_WORKSPACE}/debug-via-reverse-proxy.sh nonblock
 
     - name: 检查空间使用情况（清理情况）
       if: (!cancelled())
