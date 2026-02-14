@@ -64,7 +64,7 @@ env:
   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   FREE_DISK_SH: scripts/free_disk_space.sh
   ENV_SH: scripts/environment.sh
-  REPO_URL_BUILDER: https://github.com/wujinjun-MC/openwrt-ci
+  REPO_URL_BUILDER: https://github.com/wujinjun-MC/Actions-immortalwrt
   REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: openwrt-25.12
   # 修改 REPO_BRANCH 来达到更改编译版本
