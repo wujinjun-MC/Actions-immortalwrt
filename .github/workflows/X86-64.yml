@@ -16,6 +16,46 @@ permissions: write-all
 on:
   # repository_dispatch:
   workflow_dispatch:
+    # 增加交互式开关，方便在启动时选择是否进入调试模式
+    inputs:
+      debug_or_make_config:
+        description: "是否开启远程调试 (Cpolar)"
+        default: "mkconf"
+        type: choice
+        options:
+          - none
+          - debug
+          - mkconf
+      menuconfig_color:
+        description: 'make menuconfig 配色。默认 bluetitle (蓝白配色)，可选 blackbg (夜间模式)'
+        required: true
+        default: 'blackbg'
+        type: choice
+        options:
+          - mono
+          - blackbg
+          - classic
+          - bluetitle
+      cpolar_token_type:
+        description: '选择使用的 Cpolar Token'
+        required: true
+        default: 'TOKEN_1'
+        type: choice
+        options:
+          - TOKEN_1
+          - TOKEN_2
+      force_single_thread:
+        description: "强制单线程编译"
+        default: false
+        type: boolean
+      use_ccache:
+        description: "使用 ccache 加速编译"
+        default: true
+        type: boolean
+      fix_version_invalid:
+        description: "自动修复插件版本号不合法 (PKG_VERSION and PKG_RELEASE)"
+        default: true
+        type: boolean
   # schedule:
   #  - cron: 0 20 * * 4
   #  #      分,时,日,月,周。每周五 20时执行一次 (UTC时间)
@@ -25,7 +65,7 @@ env:
   FREE_DISK_SH: scripts/free_disk_space.sh
   ENV_SH: scripts/environment.sh
   REPO_URL: https://github.com/immortalwrt/immortalwrt
-  REPO_BRANCH: openwrt-24.10
+  REPO_BRANCH: openwrt-25.12
   # 修改 REPO_BRANCH 来达到更改编译版本
   PLATFORM_FILE: configs/Target-X86.txt
   CONFIG_FILE: configs/Packages.txt
@@ -35,18 +75,52 @@ env:
   INSTALL5G_SH: scripts/install-5G.sh
   CLASH_CORE_SH: scripts/preset-clash-core-amd64.sh
   RUST_SH: scripts/rust.sh
+  CUSTOM_SH: scripts/custom-wujinjun-1.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
+  # --- 注入 Cpolar 所需的环境变量 ---
+  MY_SSH_PUB_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+  CPOLAR_TOKEN_1: ${{ secrets.CPOLAR_TOKEN_1 }}
+  CPOLAR_TOKEN_2: ${{ secrets.CPOLAR_TOKEN_2 }}
+  # Workflow dispatch 变量
+  CPOLAR: ${{ inputs.debug_or_make_config || 'none' }}
+  MENUCONFIG_COLOR: ${{ inputs.menuconfig_color || 'bluetitle' }}
+  CPOLAR_TOKEN_TYPE: ${{ inputs.cpolar_token_type || 'TOKEN_1' }}
+  FORCE_SINGLE_THREAD: ${{ inputs.force_single_thread || false }}
+  USE_CCACHE: ${{ inputs.use_ccache || true }}
+  FIX_VERSION_INVALID: ${{ inputs.fix_version_invalid || true }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 检查代码
-      uses: actions/checkout@main
+    - name: Record Startup Timestamp(记录启动时间戳)
+      run: |
+        sudo timedatectl set-timezone "$TZ"
+        printf "TIMESTAMP_START=%(%s)T" >> $GITHUB_ENV
+
+    # 1. 在初始化环境前，如果选择了 debug 模式，先启动隧道（非阻塞模式）
+    - name: Remote debug (Startup)
+      if: env.CPOLAR == 'debug'
+      shell: bash
+      run: bash ${GITHUB_WORKSPACE}/debug-via-reverse-proxy.sh nonblock
+
+    - name: Check Server Performance(检查服务器性能)
+      run: |
+        echo "警告⚠"
+        echo "分配的服务器性能有限，若选择的插件过多，务必注意CPU性能！"
+        echo -e "已知CPU型号（降序）：7763，8370C，8272CL，8171M，E5-2673 \n"
+        echo "--------------------------CPU信息--------------------------"
+        echo "CPU物理数量：$(cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l)"
+        echo -e "CPU核心信息：$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+        echo "--------------------------内存信息--------------------------"
+        echo "已安装内存详细信息："
+        echo -e "$(sudo lshw -short -C memory | grep GiB) \n"
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
     - name: 检测 /dev/sda1 分区是否存在（Overlay部分）
       id: overlay
@@ -64,11 +138,31 @@ jobs:
         chmod +x $FREE_DISK_SH && $FREE_DISK_SH
         sudo -E apt-get -qq update -y
         sudo -E apt-get -qq full-upgrade -y
+        sudo -E apt -yqq install dos2unix libfuse-dev
         chmod +x $ENV_SH && $ENV_SH
         sudo rm -rf /etc/apt/sources.list.d/*
         sudo rm -rf /var/lib/apt/lists/*
+        sudo -E apt -yqq autoremove --purge
+        sudo -E apt -yqq autoclean
+        sudo -E apt -yqq clean
+        sudo -E systemctl daemon-reload
         # 设置时区
         sudo timedatectl set-timezone "$TZ"
+
+    - name: Combine Disks(合并磁盘)
+      uses: easimon/maximize-build-space@master
+      with:
+        swap-size-mb: 1024
+        temp-reserve-mb: 100
+        root-reserve-mb: 1024
+        remove-dotnet: true
+        remove-android: true
+        remove-haskell: true
+        remove-codeql: true
+        remove-docker-images: true
+
+    - name: 检查代码
+      uses: actions/checkout@main
 
     - name: 检查空间使用情况（清理情况）
       if: (!cancelled())
@@ -99,19 +193,54 @@ jobs:
       if: (!cancelled())
       run: df -hT
 
+    - name: Clone Source Code(克隆源代码)
+      run: |
+        df -hT $GITHUB_WORKSPACE
+        git clone --depth 1 -b $REPO_BRANCH $REPO_URL openwrt
+        cd openwrt
+        echo "OPENWRT_PATH=$PWD" >> $GITHUB_ENV
+        VERSION_INFO=$(git show -s --date=short --format="作者: %an<br/>时间: %cd<br/>内容: %s<br/>hash: %H")
+        echo "VERSION_INFO=$VERSION_INFO" >> $GITHUB_ENV
+
     - name: 克隆源码
       working-directory: /workdir
       run: |
         git clone $REPO_URL --depth 1 -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-        cd ./openwrt/ && echo "WRT_HASH=$(git log -1 --pretty=format:'%h')" >> $GITHUB_ENV
+        cd ./openwrt/ && echo "OPENWRT_PATH=$PWD" >> $GITHUB_ENV && echo "WRT_HASH=$(git log -1 --pretty=format:'%h')" >> $GITHUB_ENV
+        VERSION_INFO=$(git show -s --date=short --format="作者: %an<br/>时间: %cd<br/>内容: %s<br/>hash: %H")
+        echo "VERSION_INFO=$VERSION_INFO" >> $GITHUB_ENV
 
         # GitHub Action 移除国内下载源
         PROJECT_MIRRORS_FILE="./scripts/projectsmirrors.json"
         if [ -f "$PROJECT_MIRRORS_FILE" ]; then
           sed -i '/.cn\//d; /tencent/d; /aliyun/d' "$PROJECT_MIRRORS_FILE"
         fi
+
+    - name: Generate Release Tag (生成日期Tag)
+      run: |
+        # 生成格式为 2024.05.20-1530 的时间戳
+        RELEASE_TAG="X86_64-$(date +%Y.%m.%d-%H%M)-${{ github.run_id }}"
+        echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+        echo "FIRMWARE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+
+    - name: Generate Variables(生成变量)
+      run: |
+        cp $CONFIG_FILE $OPENWRT_PATH/.config
+        cd $OPENWRT_PATH
+        make defconfig > /dev/null 2>&1
+        SOURCE_REPO="$(echo $REPO_URL | awk -F '/' '{print $(NF)}')"
+        echo "SOURCE_REPO=$SOURCE_REPO" >> $GITHUB_ENV
+        DEVICE_TARGET=$(cat .config | grep CONFIG_TARGET_BOARD | awk -F '"' '{print $2}')
+        echo "DEVICE_TARGET=$DEVICE_TARGET" >> $GITHUB_ENV
+        DEVICE_SUBTARGET=$(cat .config | grep CONFIG_TARGET_SUBTARGET | awk -F '"' '{print $2}')
+        echo "DEVICE_SUBTARGET=$DEVICE_SUBTARGET" >> $GITHUB_ENV
+        # 提取 Commit 信息
+        echo "COMMIT_HASH=$(cd $OPENWRT_PATH && git rev-parse HEAD)" >> $GITHUB_ENV
+        echo "SHORT_COMMIT=$(cd $OPENWRT_PATH && git rev-parse --short HEAD)" >> $GITHUB_ENV
+        echo "COMMIT_HASH_BUILDER=$(cd $GITHUB_WORKSPACE && git rev-parse HEAD)" >> $GITHUB_ENV
+        echo "SHORT_COMMIT_BUILDER=$(cd $GITHUB_WORKSPACE && git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: 检查缓存
       id: check-cache
@@ -154,7 +283,17 @@ jobs:
 
     - name: 安装 feeds
       run: |
-        cd openwrt
+        cd $OPENWRT_PATH
+
+        # 添加small-package https://github.com/kenzok8/small-package
+        echo >> feeds.conf.default
+        sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
+
+        # 添加istoreos界面 https://github.com/linkease/nas-packages-luci
+        echo >> feeds.conf.default
+        echo 'src-git nas https://github.com/linkease/nas-packages.git;master' >> feeds.conf.default
+        echo 'src-git nas_luci https://github.com/linkease/nas-packages-luci.git;main' >> feeds.conf.default
+        
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
@@ -170,6 +309,27 @@ jobs:
         chmod +x $GITHUB_WORKSPACE/$PACKAGES_SH && $GITHUB_WORKSPACE/$PACKAGES_SH
         chmod +x $GITHUB_WORKSPACE/$INSTALL5G_SH && $GITHUB_WORKSPACE/$INSTALL5G_SH
         chmod +x $GITHUB_WORKSPACE/$CLASH_CORE_SH && $GITHUB_WORKSPACE/$CLASH_CORE_SH
+        chmod +x $GITHUB_WORKSPACE/$CUSTOM_SH && $GITHUB_WORKSPACE/$CUSTOM_SH
+
+        chmod +x $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh
+        $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh
+        chmod +x $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh
+        $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh
+
+    - name: Place bash history (注入bash命令历史记录)
+      if: ${{ env.CPOLAR != 'debug' }}
+      shell: bash
+      run: |
+        cp "$GITHUB_WORKSPACE/bash_history" ~/.bash_history
+
+    # 2. 核心步骤：在编译前进入交互式 menuconfig
+    - name: Remote make menuconfig (远程改配置)
+      if: env.CPOLAR == 'mkconf'
+      shell: bash
+      run: |
+        # 此时 cpolar 会启动并进入阻塞状态，直到你手动删除 /tmp/keep-term
+        # 你可以在 SSH 终端里执行 cd $OPENWRT_PATH && make menuconfig
+        bash ${GITHUB_WORKSPACE}/debug-via-reverse-proxy.sh
 
     - name: 下载文件
       run: |
@@ -179,22 +339,116 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
+    - name: Build ccache if needed (在需要时设置ccache)
+      run: |
+        cd $OPENWRT_PATH
+
+        # 如果设置使用ccache,自动打开
+        if [ "$USE_CCACHE"x = "true"x ]; then
+          echo "检测到 "'$USE_CCACHE'" = true，正在修改配置以开启ccache"
+          sed -i 's/# CONFIG_CCACHE is not set/CONFIG_CCACHE=y/' .config
+          sed -i 's/CONFIG_CCACHE=n/CONFIG_CCACHE=y/' .config
+          grep -q "CONFIG_CCACHE=y" .config || echo "CONFIG_CCACHE=y" >> .config
+        fi
+
+        # 检查和构建ccache
+        if grep "CONFIG_CCACHE=y" .config; then
+          ccache_path=./staging_dir/host/bin/ccache
+          if [ -e "$ccache_path" ]; then
+            echo "已打开ccache选项，并且工具链已存在，跳过工具链构建"
+            mkdir -p "$OPENWRT_PATH/.ccache"
+            echo "ENABLED_CCACHE=true" >> $GITHUB_ENV
+          else
+            echo "已打开ccache选项，但ccache二进制文件没有放入 $ccache_path "
+            if ccache_path_system=$(which ccache); then
+              echo "系统已安装ccache，正在创建符号链接 \"$ccache_path_system\" -> \"$ccache_path\""
+              ln -s "$ccache_path_system" "$ccache_path"
+              echo "ENABLED_CCACHE=true" >> $GITHUB_ENV
+            else
+              echo "系统未安装ccache，开始构建"
+              if make tools/ccache/compile -j$(nproc); then
+                echo "ccache 构建成功，本次编译将支持ccache"
+                #make tools/install
+                mkdir -p "$OPENWRT_PATH/.ccache"
+                echo "ENABLED_CCACHE=true" >> $GITHUB_ENV
+              else
+                echo "ccache 构建失败，正在关闭ccache"
+                sed -i 's/^CONFIG_CCACHE=y/# CONFIG_CCACHE is not set/' .config
+                make defconfig
+                echo "ENABLED_CCACHE=false" >> $GITHUB_ENV
+              fi
+            fi
+          fi
+        else
+          echo "ENABLED_CCACHE=false" >> $GITHUB_ENV
+        fi
+
     - name: 空间使用情况（编译前）
       if: (!cancelled())
       run: df -hT
 
-    - name: 编译固件
+    - name: Compile Firmware (多线程尝试)
       id: compile
+      if: ${{ env.FORCE_SINGLE_THREAD == 'false' }}
+      continue-on-error: true # 允许此步失败，以便触发下方的重试逻辑
       run: |
-        cd openwrt
-        make defconfig
-        echo -e "$(nproc) thread compile"
-        make -j$(($(nproc)+1)) || make -j1 V=s
+        set -o pipefail
+        cd $OPENWRT_PATH
+        echo -e "$(( $(nproc) + 1 )) thread compile"
+        # 记录开始编译时的时间戳
+        printf "TIMESTAMP_START_COMPILE=%(%s)T" > $GITHUB_ENV
+
+        echo >> "$OPENWRT_PATH/build-log.log"
+        echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
+        echo >> "$OPENWRT_PATH/build-log.log"
+
+        # 第一次尝试：多线程编译
+        make -j$(( $(nproc) + 1 )) V=w 2>&1 | tee -a "$OPENWRT_PATH/build-log.log"
+
+        echo >> "$OPENWRT_PATH/build-log.log"
+        echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
+        echo >> "$OPENWRT_PATH/build-log.log"
+
         echo "status=success" >> $GITHUB_OUTPUT
+        echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+        echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+
+    - name: Compile Firmware Single Thread with Verbosity (单线程详细模式)
+      id: compile_j1  
+      if: ${{ env.FORCE_SINGLE_THREAD == 'true' }}
+      run: |
+        set -o pipefail
+        cd $OPENWRT_PATH
+
+        echo >> "$OPENWRT_PATH/build-log.log"
+        echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
+        echo >> "$OPENWRT_PATH/build-log.log"
+
+        echo "单线程详细模式 (V=s)"
+        # 单线程编译，V=s 会打印所有错误输出
+        echo "compile=true" >> $GITHUB_OUTPUT
+        make -j1 V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log.log"
+        
+        echo >> "$OPENWRT_PATH/build-log.log"
+        echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
+        echo >> "$OPENWRT_PATH/build-log.log"
+
+        echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+        echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
 
     - name: 空间使用情况（编译占用）
       if: (!cancelled())
       run: df -hT
+
+    - name: Upload Build Log and Custom Release Notes to Artifact (备份编译日志和自定义发布信息到Artifact)
+      if: always()
+      uses: actions/upload-artifact@main
+      with:
+        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}.log
+        include-hidden-files: true
+        path: |
+          ${{ env.OPENWRT_PATH }}/build-log.log
+          ${{ env.OPENWRT_PATH }}/custom_release_notes.txt
 
     - name: 上传 bin 目录
       uses: actions/upload-artifact@main
@@ -208,12 +462,28 @@ jobs:
       if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
-        rm -rf *.bin
-        rm -rf *.buildinfo 
-        rm -rf *.json 
-        rm -rf *.manifest 
+        cat sha256sums
+        
+        echo "VERSION_KERNEL=$(find -type f -name "*.manifest" -exec grep -oP '^kernel - \K.*?(?=~|-\d+-)' {} \;)" >> $GITHUB_ENV
+        cp $OPENWRT_PATH/.config build.config
+        
+        # 兼容 .ipk ，打开了 opkg 模式后仍然可以通过
+        if mv -f $OPENWRT_PATH/bin/packages/*/*/*.apk packages; then
+          echo "移动 *.apk 的软件包到打包目录 成功"
+        else
+          echo "移动 *.apk 的软件包到打包目录 失败，正在回退到 *.ipk"
+          if mv -f $OPENWRT_PATH/bin/packages/*/*/*.ipk packages; then
+            echo "移动 *.ipk 的软件包到打包目录 成功"
+          else
+            echo "移动 *.ipk 的软件包到打包目录 失败"
+            exit 1
+          fi
+        fi
+
+        tar -zcf Packages.tar.gz packages
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: 上传固件目录
@@ -227,15 +497,106 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && steps.compile.outputs.status == 'success' && !cancelled()
       run: |
-        VERSION1="${REPO_BRANCH#*-}"
-        echo -e "🎉 X86-64 平台\n✅ ${VERSION1} 源码\n❗️ ip地址 : 192.168.8.1" >> release.txt
-        echo "release_tag=$(date +"%Y.%m.%d-${VERSION1}_X86-64")" >> $GITHUB_OUTPUT
+        echo "**This is OpenWrt Firmware for (IPQ60XX-nn6000-6.12-WIFI)**" >> release.txt
+        echo "### Builder信息" >> release.txt
+        echo "- 🔗 源码版本: [${{ env.SHORT_COMMIT_BUILDER }}](${{ env.REPO_URL_BUILDER }}/commit/${{ env.COMMIT_HASH_BUILDER }})" >> release.txt
+        echo "- 🚀 本次运行 Workflow: [#${{ github.run_number }} (${{ github.run_id }})](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> release.txt
+        echo "- 🛠️ workflow 定义文件: [${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/IPQ60XX-6.12-WIFI.yml)" >> release.txt
+        echo "- ⚙️ 编译模式: ${{ env.FORCE_SINGLE_THREAD == 'true' && '强制单线程' || '自动多线程' }}" >> release.txt
+        echo "- ⚙️ 编译缓存: ${{ env.ENABLED_CCACHE == 'true' && '已启用' || '已禁用' }}" >> release.txt
+        echo "### 📒 固件信息(WIFI)" >> release.txt
+        echo "- 带WIFI带有线NSS的6.12内核固件" >> release.txt
+        echo "- 💻 这是 (IPQ60XX-nn6000-6.12-WIFI) 平台使用的 OpenWrt 固件" >> release.txt
+        echo "- ⚽ 固件源码: ${{ env.REPO_URL }}" >> release.txt
+        echo "- 💝 源码分支: ${{ env.REPO_BRANCH }}" >> release.txt
+        echo "- 🔗 源码版本: [${{ env.SHORT_COMMIT }}](${{ env.REPO_URL }}/commit/${{ env.COMMIT_HASH }})" >> release.txt
+        echo "- 🛠️ 编译模式: ${{ inputs.force_single_thread == 'true' && '强制单线程' || '多线程，失败后单线程' }}" >> release.txt
+        echo "- 🌐 默认地址: 192.168.31.1" >> release.txt
+        echo "- 🔑 默认密码: password" >> release.txt
+        echo "### 🧊 固件版本" >> release.txt
+        echo "- 固件内核版本：${{ env.VERSION_KERNEL }}" >> release.txt
+        echo "- 固件编译前最后一次➦[主源码](${{ env.REPO_URL }})更新记录:" >> release.txt
+        echo "  - ${{ env.VERSION_INFO }}" >> release.txt
+        if [ -e "$OPENWRT_PATH/custom_release_notes.txt" ]; then
+          echo "### 自定义发布信息" >> release.txt
+          echo "<details>" >> release.txt
+          echo >> release.txt
+
+          echo "<summary>点击展开</summary>" >> release.txt
+          echo >> release.txt
+
+          cat "$OPENWRT_PATH/custom_release_notes.txt" >> release.txt
+          echo >> release.txt
+
+          echo "</details>" >> release.txt
+        fi
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: 上传固件到发布
       uses: softprops/action-gh-release@master
       if: steps.tag.outputs.status == 'success' && !cancelled()
       with:
-        tag_name: ${{ steps.tag.outputs.release_tag }}
+        tag_name: ${{ env.FIRMWARE_TAG }} # 使
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
+
+    - name: Final disk usage 4
+      if: always()
+      run: |
+        df -h
+
+    # 3. 编译完成后，如果是 debug 模式，等待一段时间避免立即关机
+    - name: Wait for Remote Debug Exit
+      if: env.CPOLAR != 'none' && !cancelled()
+      shell: bash
+      run: |
+        # 防止编译报错后立即销毁虚拟机，给你留出上去排查日志的时间
+        # echo "Cpolar is running, waiting for timeout or manual exit..."
+        # # sudo timedatectl set-timezone ${{ env.TZ }}
+        # printf "TIMESTAMP_AFTER_PACKAGING=%(%s)T" > $GITHUB_ENV
+        # ( pgrep cpolar && [ $(( TIMESTAMP_AFTER_PACKAGING - TIMESTAMP_AFTER_COMPILE )) -lt 21500 ] ) || exit 0
+        # sleep $(( 21550 - $(( TIMESTAMP_AFTER_PACKAGING - TIMESTAMP_AFTER_COMPILE )) ))
+        
+        # 设置结束时间戳（约 6 小时超时限制）
+        # GitHub Actions 单个 Job 限制为 360 分钟 (21600秒)
+        sudo timedatectl set-timezone "$TZ"
+        MAX_RUNTIME=21500
+        export TIMESTAMP_STOP=$(printf "%(%s)T")
+        printf "TIMESTAMP_STOP=$TIMESTAMP_STOP" >> $GITHUB_ENV
+        FLAG_FILE="/tmp/keep-cpolar"
+
+        echo "========================================================="
+        echo "所有运行已结束，用时 $(( TIMESTAMP_STOP - TIMESTAMP_START )) 秒"
+        echo "远程调试保持中..."
+        echo "退出方式: 1. SSH输入 'rm $FLAG_FILE' | 2. 终止 cpolar 进程 | 3. 接近 Action 时间限制"
+        echo "========================================================="
+
+        # 创建标志文件（如果不存在）
+        touch "$FLAG_FILE"
+        
+        while true; do
+          CURRENT_TIME=$(date +%s)
+          ELAPSED=$(( CURRENT_TIME - TIMESTAMP_START ))
+          echo "当前消耗时间: ${ELAPSED}s"
+          
+          # 检查 1: 标志文件是否被删除
+          if [ ! -f "$FLAG_FILE" ]; then
+            echo "检测到 $FLAG_FILE 已被删除，正在退出..."
+            break
+          fi
+          
+          # 检查 2: cpolar 进程是否存在
+          if ! pgrep cpolar > /dev/null; then
+            echo "检测到 cpolar 进程已退出，正在结束任务..."
+            break
+          fi
+          
+          # 检查 3: 是否接近 6 小时运行上限
+          if [ $ELAPSED -gt $MAX_RUNTIME ]; then
+            echo "接近 Action 运行限时，正在自动退出..."
+            break
+          fi
+          
+          # 每 10 秒检测一次，避免占用过多 CPU
+          sleep 10
+        done
