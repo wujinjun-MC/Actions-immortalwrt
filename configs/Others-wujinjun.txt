@@ -1,58 +1,57 @@
-# ---- wujinjun 其他设置 ----
+# # ---- wujinjun 其他设置 ----
 
-# 1. Target Images
+# # 1. Target Images
 
-# 开启 ext4 镜像
-CONFIG_TARGET_ROOTFS_EXT4FS=y
+# # 开启 ext4 镜像
+# CONFIG_TARGET_ROOTFS_EXT4FS=y
 
-# 来点缓冲
-CONFIG_GRUB_TIMEOUT=5
+# # 来点缓冲
+# CONFIG_GRUB_TIMEOUT=5
 
-# 遇水变大变高 ?
-CONFIG_TARGET_KERNEL_PARTSIZE=512
-CONFIG_TARGET_ROOTFS_PARTSIZE=4096
+# # 遇水变大变高 ?
+# CONFIG_TARGET_KERNEL_PARTSIZE=512
+# CONFIG_TARGET_ROOTFS_PARTSIZE=4096
 
-# ISO 启动镜像 (方便临时测试)
-CONFIG_ISO_IMAGES=y
+# # ISO 启动镜像 (方便临时测试)
+# # CONFIG_ISO_IMAGES=y
 
-# 虚拟机镜像
-CONFIG_QCOW2_IMAGES=y
-CONFIG_VDI_IMAGES=y
-CONFIG_VHDX_IMAGES=y
+# # 虚拟机镜像
+# # CONFIG_QCOW2_IMAGES=y
+# # CONFIG_VDI_IMAGES=y
+# # CONFIG_VHDX_IMAGES=y
 
-# /var 持久化
-CONFIG_TARGET_ROOTFS_PERSIST_VAR=y
+# # /var 持久化
+# CONFIG_TARGET_ROOTFS_PERSIST_VAR=y
 
-# 1.1 Kernel build options
+# # 1.1 Kernel build options
 
-# 在 dmesg 显示: 内核 软/硬 锁定、任务卡死
-## 容易超时失败，用 `make -j1 V=s` 看，会发现 `Prefer the buddy CPU hardlockup detector (HARDLOCKUP_DETECTOR_PREFER_BUDDY) [N/y/?] (NEW)` 正在询问，所以需要记得加上
-CONFIG_KERNEL_SOFTLOCKUP_DETECTOR=y
-CONFIG_KERNEL_HARDLOCKUP_DETECTOR=y
-CONFIG_KERNEL_DETECT_HUNG_TASK=y
-CONFIG_KERNEL_WQ_WATCHDOG=y
-CONFIG_HARDLOCKUP_DETECTOR_PREFER_BUDDY=y
+# # 在 dmesg 显示: 内核 软/硬 锁定、任务卡死
+# ## 容易超时失败，用 `make -j1 V=s` 看，会发现 `Prefer the buddy CPU hardlockup detector (HARDLOCKUP_DETECTOR_PREFER_BUDDY) [N/y/?] (NEW)` 正在询问，所以需要记得加上
+# CONFIG_KERNEL_SOFTLOCKUP_DETECTOR=y
+# CONFIG_KERNEL_HARDLOCKUP_DETECTOR=y
+# CONFIG_KERNEL_DETECT_HUNG_TASK=y
+# CONFIG_KERNEL_WQ_WATCHDOG=y
 
-# Compile the kernel with device tmpfs enabled
-CONFIG_KERNEL_DEVTMPFS=y
-## Automatically mount devtmpfs after root filesystem is mounted
-CONFIG_KERNEL_DEVTMPFS_MOUNT=y
+# # Compile the kernel with device tmpfs enabled
+# CONFIG_KERNEL_DEVTMPFS=y
+# ## Automatically mount devtmpfs after root filesystem is mounted
+# CONFIG_KERNEL_DEVTMPFS_MOUNT=y
 
-# Compile the kernel with built-in {BTRFS,EROFS} support
-CONFIG_KERNEL_BTRFS_FS=y
-CONFIG_KERNEL_EROFS_FS=y
+# # Compile the kernel with built-in {BTRFS,EROFS} support
+# # CONFIG_KERNEL_BTRFS_FS=y
+# # CONFIG_KERNEL_EROFS_FS=y
 
-# /dev/mem virtual device support
-CONFIG_KERNEL_DEVMEM=y
+# # /dev/mem virtual device support
+# CONFIG_KERNEL_DEVMEM=y
 
-# end 1.1 Kernel build options
-# end 1. Target Images
+# # end 1.1 Kernel build options
+# # end 1. Target Images
 
-# 2. Advanced configuration options (for developers)
-CONFIG_DEVEL=y
+# # 2. Advanced configuration options (for developers)
+# CONFIG_DEVEL=y
 
-# Show broken platforms / packages / devices
-CONFIG_BROKEN=y
+# # Show broken platforms / packages / devices
+# CONFIG_BROKEN=y
 
-# 3. Build the OpenWrt Image Builder
-CONFIG_IB=y
+# # 3. Build the OpenWrt Image Builder
+# CONFIG_IB=y
