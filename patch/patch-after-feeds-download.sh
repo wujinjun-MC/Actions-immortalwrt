@@ -1,4 +1,7 @@
 #!/bin/bash
+
+cd "$OPENWRT_PATH"
+
 # 1. patch-01-fix-version-invalid 修复插件版本号不合法
 if [ "$FIX_VERSION_INVALID"x = "true"x ]; then
     echo '$FIX_VERSION_INVALID'"=true, applying patch-01-fix-version-invalid ( 修复插件版本号不合法 )"
@@ -10,3 +13,8 @@ fi
 echo "Applying patch-02-fix-KMOD_oaf-app_filter-dot-c-indent-mixed-space-and-tab ( 修复 oaf 内核模块 缩进混用空格和TAB )"
 echo ">> Execute $GITHUB_WORKSPACE/patch/02-fix-KMOD_oaf-app_filter-dot-c-indent-mixed-space-and-tab.sh"
 bash "$GITHUB_WORKSPACE/patch/02-fix-KMOD_oaf-app_filter-dot-c-indent-mixed-space-and-tab.sh"
+
+# 3. patch-03-fix-BIOS-Boot-Partition-is-under-1MiB 修复 BIOS Boot 分区缺少空间
+echo "Applying patch-03-fix-BIOS-Boot-Partition-is-under-1MiB ( 修复 BIOS Boot 分区缺少空间 )"
+echo ">> patch target/linux/x86/image/Makefile $GITHUB_WORKSPACE/patch/03-fix-BIOS-Boot-Partition-is-under-1MiB.patch"
+patch target/linux/x86/image/Makefile "$GITHUB_WORKSPACE/patch/03-fix-BIOS-Boot-Partition-is-under-1MiB.patch"
