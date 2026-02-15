@@ -19,7 +19,7 @@ on:
     # 增加交互式开关，方便在启动时选择是否进入调试模式
     inputs:
       debug_or_make_config:
-        description: "是否开启远程调试 (Cpolar)"
+        description: "远程调试 (Cpolar)"
         default: "mkconf"
         type: choice
         options:
@@ -51,6 +51,10 @@ on:
       use_ccache:
         description: "使用 ccache 加速编译"
         default: true
+        type: boolean
+      use_larger:
+        description: "使用更多软件包 (-larger)"
+        default: false
         type: boolean
       fix_version_invalid:
         description: "自动修复插件版本号不合法 (PKG_VERSION and PKG_RELEASE)"
@@ -94,6 +98,7 @@ env:
   CPOLAR_TOKEN_TYPE: ${{ inputs.cpolar_token_type || 'TOKEN_1' }}
   FORCE_SINGLE_THREAD: ${{ inputs.force_single_thread || false }}
   USE_CCACHE: ${{ inputs.use_ccache || true }}
+  USE_LARGER: ${{ inputs.use_larger || false }}
   FIX_VERSION_INVALID: ${{ inputs.fix_version_invalid || true }}
 
 jobs:
@@ -296,7 +301,9 @@ jobs:
         [ -f $CONFIG_5G ] && cat $CONFIG_5G >> openwrt/.config
         [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> openwrt/.config
         [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> openwrt/.config
-        # [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> openwrt/.config
+        if [ "$USE_LARGER"x = "true"x ]; then
+          [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> openwrt/.config
+        fi
         chmod +x $RUST_SH && $RUST_SH
         cd openwrt
         chmod +x $GITHUB_WORKSPACE/$SETTINGS_SH && $GITHUB_WORKSPACE/$SETTINGS_SH
