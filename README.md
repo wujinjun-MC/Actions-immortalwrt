@@ -57,6 +57,13 @@
     2. 内核不兼容
     3. 源码有bug
     4. 冲突
+      1. `luci-app-eqos` and `eqos-3` (无中生包? config 里面根本没有):
+        ```
+        ERROR: luci-app-eqos-26.042.32073~dd800de: trying to overwrite etc/config/eqos owned by eqos-3.
+        ERROR: luci-app-eqos-26.042.32073~dd800de: trying to overwrite etc/hotplug.d/iface/10-eqos owned by eqos-3.
+        ERROR: luci-app-eqos-26.042.32073~dd800de: trying to overwrite etc/init.d/eqos owned by eqos-3.
+        ERROR: luci-app-eqos-26.042.32073~dd800de: trying to overwrite usr/sbin/eqos owned by eqos-3.
+        ```
     5. 看起来编译成功，实际刷入后用不了 (参见 [已测试通过](#已测试通过) 的测试状态)
     6. 迷惑行为
     7. 缺失依赖

@@ -88,6 +88,7 @@ env:
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
+  CAN_UPLOAD: false # 勿动指示器，用于区别是否可以上传 Artifact / Release ，除了自然编译成功可触发，失败后手动调试并触发也可以
   # --- 注入 Cpolar 所需的环境变量 ---
   MY_SSH_PUB_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
   CPOLAR_TOKEN_1: ${{ secrets.CPOLAR_TOKEN_1 }}
@@ -422,6 +423,7 @@ jobs:
         echo >> "$OPENWRT_PATH/build-log.log"
 
         echo "status=success" >> $GITHUB_OUTPUT
+        echo "CAN_UPLOAD=true" >> $GITHUB_ENV
         echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
 
@@ -445,18 +447,94 @@ jobs:
         echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
         echo >> "$OPENWRT_PATH/build-log.log"
 
+        echo "status=success" >> $GITHUB_OUTPUT
+        echo "CAN_UPLOAD=true" >> $GITHUB_ENV
         echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+
+    - name: Upload Build Log and Custom Release Notes to Artifact (备份编译日志和自定义发布信息到Artifact) 1
+      if: always()
+      uses: actions/upload-artifact@main
+      with:
+        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-1.log
+        include-hidden-files: true
+        path: |
+          ${{ env.OPENWRT_PATH }}/build-log.log
+          ${{ env.OPENWRT_PATH }}/custom_release_notes.txt
+
+    # 智能检查是否编译成功，如果没有成功并运行了 Cpolar ，进入调试等待，根据用户操作确定最终是否成功
+    - name: Check if Success and Wait (确认是否成功，等待)
+      if: env.CPOLAR != 'none' && !cancelled()
+      shell: bash
+      run: |
+        # 检查是否成功，已成功时直接跳过
+        if [ "$CAN_UPLOAD"x = "true"x ]; then
+          echo "已经成功了，跳过"
+          exit 0
+        fi
+
+        # 设置结束时间戳（约 6 小时超时限制）
+        # GitHub Actions 单个 Job 限制为 360 分钟 (21600秒)
+        sudo timedatectl set-timezone "$TZ"
+        MAX_RUNTIME=20000 # 留更长时间，保证后面打包不超时
+        export TIMESTAMP_STOP=$(printf "%(%s)T")
+        # printf "TIMESTAMP_STOP=$TIMESTAMP_STOP" >> $GITHUB_ENV
+        FLAG_FILE="/tmp/keep-cpolar"
+        SUCCESS_FILE="/tmp/make-force-success"
+
+        echo "========================================================="
+        echo "编译失败，用时 $(( TIMESTAMP_STOP - TIMESTAMP_START )) 秒"
+        echo "远程调试保持中..."
+        echo "希望判定失败的方法: 1. SSH输入 'rm $FLAG_FILE' | 2. 终止 cpolar 进程 | 3. 接近 Action 时间限制"
+        echo "希望判定成功的方法: 1. SSH输入 'touch $SUCCESS_FILE'"
+        echo "========================================================="
+
+        # 创建标志文件（如果不存在）
+        touch "$FLAG_FILE"
+        
+        while true; do
+          CURRENT_TIME=$(date +%s)
+          ELAPSED=$(( CURRENT_TIME - TIMESTAMP_START ))
+          echo "当前消耗时间: ${ELAPSED}s"
+          
+          # 检查 1: 标志文件是否被删除
+          if [ ! -f "$FLAG_FILE" ]; then
+            echo "检测到 $FLAG_FILE 已被删除，正在退出..."
+            break
+          fi
+          
+          # 检查 2: cpolar 进程是否存在
+          if ! pgrep cpolar > /dev/null; then
+            echo "检测到 cpolar 进程已退出，正在结束任务..."
+            break
+          fi
+          
+          # 检查 3: 是否接近 6 小时运行上限
+          if [ $ELAPSED -gt $MAX_RUNTIME ]; then
+            echo "接近 Action 运行限时，正在自动退出..."
+            break
+          fi
+          
+          # 检查 4: 是否创建了强制成功文件
+          if [ -f $SUCCESS_FILE ]; then
+            echo "创建了强制成功文件，强制设置为成功"
+            echo "CAN_UPLOAD=true" >> $GITHUB_ENV
+            break
+          fi
+          
+          # 每 10 秒检测一次，避免占用过多 CPU
+          sleep 10
+        done
 
     - name: 空间使用情况（编译占用）
       if: (!cancelled())
       run: df -hT
 
-    - name: Upload Build Log and Custom Release Notes to Artifact (备份编译日志和自定义发布信息到Artifact)
+    - name: Upload Build Log and Custom Release Notes to Artifact (备份编译日志和自定义发布信息到Artifact) 2
       if: always()
       uses: actions/upload-artifact@main
       with:
-        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}.log
+        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-2.log
         include-hidden-files: true
         path: |
           ${{ env.OPENWRT_PATH }}/build-log.log
@@ -464,14 +542,14 @@ jobs:
 
     - name: 上传 bin 目录
       uses: actions/upload-artifact@main
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      if: (!cancelled()) && env.CAN_UPLOAD == 'true' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
     - name: 整理文件
       id: organize
-      if: steps.compile.outputs.status == 'success' && !cancelled()
+      if: env.CAN_UPLOAD == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
         cat sha256sums
@@ -507,7 +585,7 @@ jobs:
 
     - name: 生成发布标签
       id: tag
-      if: env.UPLOAD_RELEASE == 'true' && steps.compile.outputs.status == 'success' && !cancelled()
+      if: env.UPLOAD_RELEASE == 'true' && env.CAN_UPLOAD == 'true' && !cancelled()
       run: |
         echo "**This is OpenWrt Firmware for (IPQ60XX-nn6000-6.12-WIFI)**" >> release.txt
         echo "### Builder信息" >> release.txt

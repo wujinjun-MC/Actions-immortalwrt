@@ -2,6 +2,8 @@ ls -Al
 cd ~/work/Actions-immortalwrt/Actions-immortalwrt/openwrt
 make menuconfig
 
+touch /tmp/make-force-success
+
 tmux attach
 kill_cpolar
 enter_menuconfig
