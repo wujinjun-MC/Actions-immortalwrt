@@ -287,7 +287,7 @@ jobs:
 
         # 添加 jell https://github.com/kenzok8/jell
         echo >> feeds.conf.default
-        sed -i '$a src-git smpackage https://github.com/kenzok8/jell' feeds.conf.default
+        sed -i '$a src-git jell https://github.com/kenzok8/jell' feeds.conf.default
 
         # 添加istoreos界面 https://github.com/linkease/nas-packages-luci
         echo >> feeds.conf.default
