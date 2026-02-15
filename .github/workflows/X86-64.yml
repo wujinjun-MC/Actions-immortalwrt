@@ -141,7 +141,7 @@ jobs:
         chmod +x $FREE_DISK_SH && $FREE_DISK_SH
         sudo -E apt-get -qq update -y
         sudo -E apt-get -qq full-upgrade -y
-        sudo -E apt -yqq install dos2unix libfuse-dev ccache mkisofs
+        sudo -E apt -yqq install dos2unix libfuse-dev ccache mkisofs ncdu
         chmod +x $ENV_SH && $ENV_SH
         sudo rm -rf /etc/apt/sources.list.d/*
         sudo rm -rf /var/lib/apt/lists/*
