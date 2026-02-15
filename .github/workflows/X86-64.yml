@@ -371,6 +371,13 @@ jobs:
           echo "ENABLED_CCACHE=false" >> $GITHUB_ENV
         fi
 
+    - name: Backup Config to Artifact (备份配置到Artifact)
+      uses: actions/upload-artifact@main
+      with:
+        name: config-debug-${{ env.FIRMWARE_TAG }}
+        include-hidden-files: true
+        path: ${{ env.OPENWRT_PATH }}/.config
+
     - name: 空间使用情况（编译前）
       if: (!cancelled())
       run: df -hT
