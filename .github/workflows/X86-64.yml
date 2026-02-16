@@ -244,9 +244,9 @@ jobs:
         echo "COMMIT_HASH_BUILDER=$(cd $GITHUB_WORKSPACE && git rev-parse HEAD)" >> $GITHUB_ENV
         echo "SHORT_COMMIT_BUILDER=$(cd $GITHUB_WORKSPACE && git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-    - name: 检查缓存
-      id: check-cache
-      uses: actions/cache@main
+    - name: 检查缓存 (恢复)
+      id: check-cache-restore
+      uses: actions/cache/restore@v5
       with:
         key: x86-${{env.REPO_BRANCH}}-${{env.WRT_HASH}}
         restore-keys: x86-${{env.REPO_BRANCH}}
@@ -634,6 +634,16 @@ jobs:
       if: always()
       run: |
         df -h
+
+    - name: 检查缓存 (保存)
+      id: check-cache-save
+      uses: actions/cache/save@v5
+      with:
+        key: x86-${{env.REPO_BRANCH}}-${{env.WRT_HASH}}
+        path: |
+          ./openwrt/.ccache
+          ./openwrt/staging_dir/host*
+          ./openwrt/staging_dir/tool*
 
     # 3. 编译完成后，如果是 debug 模式，等待一段时间避免立即关机
     - name: Wait for Remote Debug Exit
