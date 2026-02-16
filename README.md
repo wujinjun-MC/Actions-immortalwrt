@@ -1,17 +1,5 @@
 <img width="768" src="https://github.com/openwrt/openwrt/blob/main/include/logo.png"/>
 
-> [!NOTE]
->
-> 之前做的是 AX5 JDC 的适配，已经移动到 old-ax5-jdc 分支，停止开发
->
-> 当前分支主要用于: nn6000 v1/v2
-
-> [!NOTE]
->
-> 正在停止开发
->
-> x86 更好玩
-
 ## 优化后的OpenWRT编译 for x86(-64) - from my `openwrt-ci`
 
 1. ~~修改默认管理地址~~
