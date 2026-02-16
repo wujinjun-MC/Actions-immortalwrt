@@ -44,6 +44,7 @@ on:
         options:
           - TOKEN_1
           - TOKEN_2
+          - TOKEN_3
       force_single_thread:
         description: "强制单线程编译"
         default: false

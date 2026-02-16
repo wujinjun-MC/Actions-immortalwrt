@@ -19,6 +19,9 @@ then
 elif [ "$CPOLAR_TOKEN_TYPE"x = "TOKEN_2"x ]
 then
     cpolar authtoken "$CPOLAR_TOKEN_2"
+elif [ "$CPOLAR_TOKEN_TYPE"x = "TOKEN_3"x ]
+then
+    cpolar authtoken "$CPOLAR_TOKEN_3"
 else
     cpolar authtoken "$CPOLAR_TOKEN_1"
 fi
