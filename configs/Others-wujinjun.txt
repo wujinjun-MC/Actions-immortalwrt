@@ -2,8 +2,9 @@
 
 # 1. Target Images
 
-# 开启 ext4 镜像
+# 开启 ext4 镜像，关闭 squashfs 镜像
 CONFIG_TARGET_ROOTFS_EXT4FS=y
+CONFIG_TARGET_ROOTFS_SQUASHFS=n
 
 # 来点缓冲
 CONFIG_GRUB_TIMEOUT=5
@@ -13,7 +14,7 @@ CONFIG_TARGET_KERNEL_PARTSIZE=512
 CONFIG_TARGET_ROOTFS_PARTSIZE=4096
 
 # ISO 启动镜像 (方便临时测试)
-CONFIG_ISO_IMAGES=y
+#CONFIG_ISO_IMAGES=y
 
 # 虚拟机镜像
 ## 大量占用存储空间，无法编译，禁用
@@ -56,4 +57,4 @@ CONFIG_DEVEL=y
 CONFIG_BROKEN=y
 
 # 3. Build the OpenWrt Image Builder
-CONFIG_IB=y
+#CONFIG_IB=y
