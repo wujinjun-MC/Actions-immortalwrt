@@ -449,6 +449,12 @@ jobs:
       if: env.CPOLAR != 'none' && !cancelled()
       shell: bash
       run: |
+        # 更新 env
+        env > ~/current_env-2.txt
+
+        # 显示当前 CAN_UPLOAD 值
+        echo "当前的 CAN_UPLOAD: $CAN_UPLOAD"
+        
         # 检查是否成功，已成功时直接跳过
         if [ "$CAN_UPLOAD"x = "true"x ]; then
           echo "已经成功了，跳过"
