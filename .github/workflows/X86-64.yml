@@ -386,23 +386,7 @@ jobs:
       if: ${{ env.FORCE_SINGLE_THREAD == 'false' }}
       continue-on-error: true # 允许此步失败，以便触发下方的重试逻辑
       run: |
-        set -o pipefail
-        cd $OPENWRT_PATH
-        echo -e "$(( $(nproc) + 1 )) thread compile"
-        # 记录开始编译时的时间戳
-        printf "TIMESTAMP_START_COMPILE=%(%s)T" > $GITHUB_ENV
-
-        echo >> "$OPENWRT_PATH/build-log.log"
-        echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
-        echo >> "$OPENWRT_PATH/build-log.log"
-
-        # 第一次尝试：多线程编译
-        make -j$(( $(nproc) + 1 )) V=w 2>&1 | tee -a "$OPENWRT_PATH/build-log.log"
-
-        echo >> "$OPENWRT_PATH/build-log.log"
-        echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
-        echo >> "$OPENWRT_PATH/build-log.log"
-
+        echo "[dummy] 跳过编译，测试 CAN_UPLOAD"
         echo "status=success" >> $GITHUB_OUTPUT
         echo "CAN_UPLOAD=true" >> $GITHUB_ENV
         echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
