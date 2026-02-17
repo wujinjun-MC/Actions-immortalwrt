@@ -46,18 +46,25 @@ sudo apt-get autoclean
 sudo apt-get clean
 df -h
 echo "删除大目录"
+echo "-- .Net"
 sudo rm -rf /usr/share/dotnet/
+echo "-- graalvm"
 sudo rm -rf /usr/local/graalvm/
+echo "-- .ghcup"
 sudo rm -rf /usr/local/.ghcup/
+echo "-- powershell"
 sudo rm -rf /usr/local/share/powershell
+echo "-- chromium"
 sudo rm -rf /usr/local/share/chromium
 echo "-- Android"
 sudo rm -rf /usr/local/lib/android
+echo "-- Node"
 sudo rm -rf /usr/local/lib/node_modules
 echo "-- Dotnet"
 sudo rm -rf /usr/share/dotnet
 echo "-- Haskell"
 sudo rm -rf /opt/ghc
+echo "-- Boost"
 sudo rm -rf /usr/local/share/boost
 echo "-- CodeQL"
 sudo rm -rf /opt/hostedtoolcache/CodeQL
