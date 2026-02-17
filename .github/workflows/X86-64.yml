@@ -89,7 +89,6 @@ env:
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
-  CAN_UPLOAD: false # 勿动指示器，用于区别是否可以上传 Artifact / Release ，除了自然编译成功可触发，失败后手动调试并触发也可以
   COMBINE_DISKS: false
   # --- 注入 Cpolar 所需的环境变量 ---
   MY_SSH_PUB_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
@@ -146,6 +145,9 @@ jobs:
         sudo -E systemctl daemon-reload
         # 设置时区
         sudo timedatectl set-timezone "$TZ"
+        # 勿动指示器，用于区别是否可以上传 Artifact / Release ，除了自然编译成功可触发，失败后手动调试并触发也可以
+        echo "CAN_UPLOAD=false" >> $GITHUB_ENV
+        
 
     - name: Combine Disks(合并磁盘)
       if: env.COMBINE_DISKS == 'true'
