@@ -148,8 +148,6 @@ jobs:
         sudo -E systemctl daemon-reload
         # 设置时区
         sudo timedatectl set-timezone "$TZ"
-        # 勿动指示器，用于区别是否可以上传 Artifact / Release ，除了自然编译成功可触发，失败后手动调试并触发也可以
-        echo "CAN_UPLOAD=false" >> $GITHUB_ENV
         
 
     - name: Combine Disks(合并磁盘)
@@ -404,6 +402,7 @@ jobs:
         echo >> "$OPENWRT_PATH/build-log.log"
 
         echo "status=success" >> $GITHUB_OUTPUT
+        echo "Changing CAN_UPLOAD to true" >> "$OPENWRT_PATH/build-log.log"
         echo "CAN_UPLOAD=true" >> $GITHUB_ENV
         echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
@@ -430,6 +429,7 @@ jobs:
         echo >> "$OPENWRT_PATH/build-log.log"
 
         echo "status=success" >> $GITHUB_OUTPUT
+        echo "Changing CAN_UPLOAD to true" >> "$OPENWRT_PATH/build-log.log"
         echo "CAN_UPLOAD=true" >> $GITHUB_ENV
         echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
@@ -458,7 +458,7 @@ jobs:
         # 设置结束时间戳（约 6 小时超时限制）
         # GitHub Actions 单个 Job 限制为 360 分钟 (21600秒)
         sudo timedatectl set-timezone "$TZ"
-        MAX_RUNTIME=20000 # 留更长时间，保证后面打包不超时
+        MAX_RUNTIME=20800 # 留更长时间，保证后面打包不超时
         export TIMESTAMP_STOP=$(printf "%(%s)T")
         # printf "TIMESTAMP_STOP=$TIMESTAMP_STOP" >> $GITHUB_ENV
         FLAG_FILE="/tmp/keep-cpolar"
@@ -482,24 +482,27 @@ jobs:
           # 检查 1: 标志文件是否被删除
           if [ ! -f "$FLAG_FILE" ]; then
             echo "检测到 $FLAG_FILE 已被删除，正在退出..."
+            echo "CAN_UPLOAD=false" >> $GITHUB_ENV
             break
           fi
           
           # 检查 2: cpolar 进程是否存在
           if ! pgrep cpolar > /dev/null; then
             echo "检测到 cpolar 进程已退出，正在结束任务..."
+            echo "CAN_UPLOAD=false" >> $GITHUB_ENV
             break
           fi
           
           # 检查 3: 是否接近 6 小时运行上限
           if [ $ELAPSED -gt $MAX_RUNTIME ]; then
             echo "接近 Action 运行限时，正在自动退出..."
+            echo "CAN_UPLOAD=false" >> $GITHUB_ENV
             break
           fi
           
-          # 检查 4: 是否创建了强制成功文件
+          # 检查 4: 是否创建了成功文件
           if [ -f $SUCCESS_FILE ]; then
-            echo "创建了强制成功文件，强制设置为成功"
+            echo "创建了成功文件，手动标记为成功"
             echo "CAN_UPLOAD=true" >> $GITHUB_ENV
             break
           fi
