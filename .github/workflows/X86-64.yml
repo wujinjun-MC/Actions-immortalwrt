@@ -128,6 +128,9 @@ jobs:
         echo "--------------------------硬盘信息--------------------------"
         echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
+    - name: 检查代码
+      uses: actions/checkout@main
+
     - name: 初始化环境
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -162,9 +165,6 @@ jobs:
         remove-haskell: true
         remove-codeql: true
         remove-docker-images: true
-
-    - name: 检查代码
-      uses: actions/checkout@main
 
     # 1. 如果选择了 debug 模式，先启动隧道（非阻塞模式）
     - name: Remote debug (Startup)
