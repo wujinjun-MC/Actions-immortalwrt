@@ -51,12 +51,16 @@ sudo rm -rf /usr/local/graalvm/
 sudo rm -rf /usr/local/.ghcup/
 sudo rm -rf /usr/local/share/powershell
 sudo rm -rf /usr/local/share/chromium
+echo "-- Android"
 sudo rm -rf /usr/local/lib/android
 sudo rm -rf /usr/local/lib/node_modules
+echo "-- Dotnet"
 sudo rm -rf /usr/share/dotnet
-sudo rm -rf /usr/local/lib/android
+echo "-- Haskell"
 sudo rm -rf /opt/ghc
 sudo rm -rf /usr/local/share/boost
+echo "-- CodeQL"
+sudo rm -rf /opt/hostedtoolcache/CodeQL
 # 清理 Docker
 docker system prune -af --volumes
 # 删除 GitHub Actions 工具缓存
