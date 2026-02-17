@@ -13,7 +13,7 @@ name: X86-64
 permissions: write-all
 #开启写权限，防止无法上传到release
 
-run-name: "x86-64 cpolar:${{ inputs.debug_or_make_config }} token:${{ inputs.cpolar_token_type }} larger:${{ inputs.use_larger }} single_thread:${{ inputs.force_single_thread }} ccache:${{ inputs.use_ccache }}"
+run-name: "x86-64 ${{ inputs.debug_or_make_config }} ${{ inputs.cpolar_token_type }} larger:${{ inputs.use_larger }} single_thread:${{ inputs.force_single_thread }} ccache:${{ inputs.use_ccache }}"
 
 on:
   # repository_dispatch:
