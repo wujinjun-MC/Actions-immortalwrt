@@ -39,7 +39,7 @@ sudo apt-get remove -y '^llvm-.*'
 sudo apt-get remove -y 'php.*'
 sudo apt-get remove -y '^mongodb-.*'
 sudo apt-get remove -y '^mysql-.*'
-sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel
+sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel google-cloud-cli google-cloud-cli-anthoscli 
 # 自动清理依赖+缓存
 sudo apt-get autoremove --purge -y
 sudo apt-get autoclean
