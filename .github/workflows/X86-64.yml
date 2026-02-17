@@ -458,7 +458,10 @@ jobs:
         
         # 检查是否成功，已成功时直接跳过
         if [ "$CAN_UPLOAD"x = "true"x ]; then
-          echo "已经成功了，跳过"
+          echo "CAN_UPLOAD=true ，判定为已经成功，跳过"
+          exit 0
+        elif cat ./bin/targets/*/*/sha256sum; then
+          echo "获取到了 sha256sum 的值，判定为已经成功，跳过"
           exit 0
         fi
 
