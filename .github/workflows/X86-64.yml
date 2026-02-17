@@ -388,7 +388,8 @@ jobs:
         cd $OPENWRT_PATH
         echo -e "$(( $(nproc) + 1 )) thread compile"
         # 记录开始编译时的时间戳
-        printf "TIMESTAMP_START_COMPILE=%(%s)T" > $GITHUB_ENV
+        printf "TIMESTAMP_START_COMPILE=%(%s)T" >> $GITHUB_ENV
+        echo >> $GITHUB_ENV
 
         echo >> "$OPENWRT_PATH/build-log.log"
         echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
@@ -644,7 +645,8 @@ jobs:
         # 防止编译报错后立即销毁虚拟机，给你留出上去排查日志的时间
         # echo "Cpolar is running, waiting for timeout or manual exit..."
         # # sudo timedatectl set-timezone ${{ env.TZ }}
-        # printf "TIMESTAMP_AFTER_PACKAGING=%(%s)T" > $GITHUB_ENV
+        # printf "TIMESTAMP_AFTER_PACKAGING=%(%s)T" >> $GITHUB_ENV
+        # echo >> $GITHUB_ENV
         # ( pgrep cpolar && [ $(( TIMESTAMP_AFTER_PACKAGING - TIMESTAMP_AFTER_COMPILE )) -lt 21500 ] ) || exit 0
         # sleep $(( 21550 - $(( TIMESTAMP_AFTER_PACKAGING - TIMESTAMP_AFTER_COMPILE )) ))
         
