@@ -132,12 +132,12 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        chmod +x $FREE_DISK_SH && $FREE_DISK_SH
+        bash $FREE_DISK_SH
         sudo -E apt-get -qq update -y
         sudo -E apt-get -qq full-upgrade -y
+        sudo bash -c 'bash <(curl -sL https://build-scripts.immortalwrt.org/init_build_environment.sh)'
         sudo -E apt -yqq install dos2unix libfuse-dev ccache mkisofs ncdu btop
         chmod +x $ENV_SH && $ENV_SH
-        sudo rm -rf /etc/apt/sources.list.d/*
         sudo rm -rf /var/lib/apt/lists/*
         sudo -E apt -yqq autoremove --purge
         sudo -E apt -yqq autoclean
