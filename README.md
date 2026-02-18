@@ -131,7 +131,17 @@
                 ERROR: package/feeds/smpackage/trojan-plus failed to build.
             ```
     13. 未知
+    14. 避雷 (更多可查看 `wujinjun-MC/openwrt-ci` 的 doc/test-notes.md)
 
+### Reasoning / 正在排查
+
+- x86:
+  1. 即使设置为开启，部分软件包仍然无法安装
+    1. LuCI
+      1. Applications
+        - luci-app-cpufreq: 仅适用于 arm `Depends on: arm [=n] || aarch64 [=n]`
+        - ~~luci-app-lxc~~: 请打开 xz-utils (从 openwrt-ci 迁移到此项目时忘记添加)
+        - ~~luci-app-quickstart~~: 请打开 xz-utils (从 openwrt-ci 迁移到此项目时忘记添加)
 
 ### 建议
 

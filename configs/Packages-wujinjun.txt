@@ -1,5 +1,14 @@
 # ---- wujinjun 添加软件包 ----
 
+# Before: Fix some issues
+## 解决 upnp 无法使用
+CONFIG_PACKAGE_libupnp=y
+
+## 默认开启 xz,xz-utils 解决部分软件包不显示
+CONFIG_PACKAGE_xz=y
+CONFIG_PACKAGE_xz-utils=y
+
+
 # 1. feeds (small-packages, jeil, nas, nas_luci) specific
 
 # LuCIs
