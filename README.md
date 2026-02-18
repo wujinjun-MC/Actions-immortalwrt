@@ -132,6 +132,7 @@
             ```
     13. 未知
     14. 避雷 (更多可查看 `wujinjun-MC/openwrt-ci` 的 doc/test-notes.md)
+      1. gnunet: 在我的机器 (j3710) 上不停出现 segfault
 
 ### Reasoning / 正在排查
 
