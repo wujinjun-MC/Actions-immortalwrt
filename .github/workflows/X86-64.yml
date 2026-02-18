@@ -593,38 +593,43 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && env.CAN_UPLOAD == 'true' && !cancelled()
       run: |
-        echo "**This is OpenWrt Firmware for (IPQ60XX-nn6000-6.12-WIFI)**" >> release.txt
+        echo "**This is OpenWrt Firmware for (x86_64)**" >> release.txt
         echo "### Builder信息" >> release.txt
         echo "- 🔗 源码版本: [${{ env.SHORT_COMMIT_BUILDER }}](${{ env.REPO_URL_BUILDER }}/commit/${{ env.COMMIT_HASH_BUILDER }})" >> release.txt
         echo "- 🚀 本次运行 Workflow: [#${{ github.run_number }} (${{ github.run_id }})](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> release.txt
-        echo "- 🛠️ workflow 定义文件: [${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/X86-64.yml)" >> release.txt
-        echo "- ⚙️ 编译模式: ${{ env.FORCE_SINGLE_THREAD == 'true' && '强制单线程' || '自动多线程' }}" >> release.txt
-        echo "- ⚙️ 编译缓存: ${{ env.ENABLED_CCACHE == 'true' && '已启用' || '已禁用' }}" >> release.txt
+        echo "- 🛠️ Workflow 定义文件: [${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/X86-64.yml)" >> release.txt
+        echo "- ⚙️ Workflow 变量 / 动态名称: x86-64 ${{ env.CPOLAR }} ${{ env.CPOLAR_TOKEN_TYPE }} larger:${{ env.USE_LARGER }} single_thread:${{ env.FORCE_SINGLE_THREAD }} ccache:${{ env.USE_CCACHE }}"
         echo "### 📒 固件信息(WIFI)" >> release.txt
-        echo "- x86_64的6.12内核固件" >> release.txt
+        echo "- x86_64的固件" >> release.txt
         echo "- 💻 这是 (x86_64) 平台使用的 OpenWrt 固件" >> release.txt
         echo "- ⚽ 固件源码: ${{ env.REPO_URL }}" >> release.txt
         echo "- 💝 源码分支: ${{ env.REPO_BRANCH }}" >> release.txt
         echo "- 🔗 源码版本: [${{ env.SHORT_COMMIT }}](${{ env.REPO_URL }}/commit/${{ env.COMMIT_HASH }})" >> release.txt
-        echo "- 🛠️ 编译模式: ${{ inputs.force_single_thread == 'true' && '强制单线程' || '多线程，失败后单线程' }}" >> release.txt
+        echo "- 🛠️ 编译模式: ${{ inputs.force_single_thread == 'true' && '单线程' || '多线程' }}" >> release.txt
         echo "- 🌐 默认地址: 192.168.8.1" >> release.txt
-        echo "- 🔑 默认密码: password" >> release.txt
         echo "### 🧊 固件版本" >> release.txt
         echo "- 固件内核版本：${{ env.VERSION_KERNEL }}" >> release.txt
         echo "- 固件编译前最后一次➦[主源码](${{ env.REPO_URL }})更新记录:" >> release.txt
         echo "  - ${{ env.VERSION_INFO }}" >> release.txt
         if [ -e "$OPENWRT_PATH/custom_release_notes.txt" ]; then
-          echo "### 自定义发布信息" >> release.txt
-          echo "<details>" >> release.txt
-          echo >> release.txt
+          custom_release_notes_length=$(cat "$OPENWRT_PATH/custom_release_notes.txt" | wc -c)
+          if [ $custom_release_notes_length -gt 100 ]; then
+            echo "### 自定义发布信息" >> release.txt
+            echo "<details>" >> release.txt
+            echo >> release.txt
 
-          echo "<summary>点击展开</summary>" >> release.txt
-          echo >> release.txt
+            echo "<summary>点击展开</summary>" >> release.txt
+            echo >> release.txt
 
-          cat "$OPENWRT_PATH/custom_release_notes.txt" >> release.txt
-          echo >> release.txt
+            cat "$OPENWRT_PATH/custom_release_notes.txt" >> release.txt
+            echo >> release.txt
 
-          echo "</details>" >> release.txt
+            echo "</details>" >> release.txt
+          else
+            echo "### 自定义发布信息" >> release.txt
+            echo >> release.txt
+            cat "$OPENWRT_PATH/custom_release_notes.txt" >> release.txt
+          fi
         fi
         echo "status=success" >> $GITHUB_OUTPUT
 
