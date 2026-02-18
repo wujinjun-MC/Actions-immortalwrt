@@ -135,6 +135,11 @@
       1. gnunet: 在我的机器 (j3710) 上不停出现 segfault
       2. dhtd: 持续占用单个 CPU 核心。 请使用 BitTorrent 相关客户端维护 DHT 网络
       3. ~~tailscale (依赖 by luci-app-tailscale{,-community}), gnunet: 日志刷屏，导致 beardropper + tail 大量 CPU 占用~~ 需要互联网连接，让服务下载需要的文件，之后就不会刷屏了
+      4. beardropper: 一些 CPU 占用，不值得
+      5. luci-theme-spectra: 进入任何页面，浏览器都会弹出下载 `index.php` 的提示
+      6. luci-theme-argone, luci-theme-atmaterial_new, luci-theme-bootstrap-mmdvm, luci-theme-design, luci-theme-edge, luci-theme-ifit, luci-theme-inas, luci-theme-opentopd, luci-theme-tomato: 这些主题无法打开
+      7. nginx-manager: Runtime error
+      8. travelmate: x86 的机器会便携? (迷你主机使用者请忽略)
 
 ### Reasoning / 正在排查
 
