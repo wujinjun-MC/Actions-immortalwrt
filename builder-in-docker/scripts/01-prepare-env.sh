@@ -25,16 +25,16 @@ cd "$OPENWRT_PATH"
 
     # 添加 small-package https://github.com/kenzok8/small-package
 echo >> feeds.conf.default
-grep "smpackage" feeds.conf.default || sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
+grep "kenzok8/small-package" feeds.conf.default || sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
 
     # 添加 jell https://github.com/kenzok8/jell
 echo >> feeds.conf.default
-grep "jell" feeds.conf.default || sed -i '$a src-git jell https://github.com/kenzok8/jell' feeds.conf.default
+grep "kenzok8/jell" feeds.conf.default || sed -i '$a src-git jell https://github.com/kenzok8/jell' feeds.conf.default
 
     # 添加 istoreos 界面 https://github.com/linkease/nas-packages-luci
 echo >> feeds.conf.default
-grep "jell" feeds.conf.default || sed -i '$a src-git nas https://github.com/linkease/nas-packages.git;master' feeds.conf.default
-grep "jell" feeds.conf.default || sed -i '$a src-git nas_luci https://github.com/linkease/nas-packages-luci.git;main' feeds.conf.default
+grep "linkease/nas-packages.git" feeds.conf.default || sed -i '$a src-git nas https://github.com/linkease/nas-packages.git;master' feeds.conf.default
+grep "linkease/nas-packages-luci.git" feeds.conf.default || sed -i '$a src-git nas_luci https://github.com/linkease/nas-packages-luci.git;main' feeds.conf.default
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
