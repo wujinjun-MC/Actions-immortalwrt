@@ -551,11 +551,11 @@ jobs:
         cp $OPENWRT_PATH/.config build.config
         
         # 兼容 .ipk ，打开了 opkg 模式后仍然可以通过
-        if mv -f $OPENWRT_PATH/bin/packages/*/*/*.apk packages; then
+        if ln -f $OPENWRT_PATH/bin/packages/*/*/*.apk packages; then
           echo "移动 *.apk 的软件包到打包目录 成功"
         else
           echo "移动 *.apk 的软件包到打包目录 失败，正在回退到 *.ipk"
-          if mv -f $OPENWRT_PATH/bin/packages/*/*/*.ipk packages; then
+          if ln -f $OPENWRT_PATH/bin/packages/*/*/*.ipk packages; then
             echo "移动 *.ipk 的软件包到打包目录 成功"
           else
             echo "移动 *.ipk 的软件包到打包目录 失败"

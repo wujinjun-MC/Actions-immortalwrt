@@ -16,7 +16,7 @@ pushd package/small
 [ -e luci-theme-aurora ] || git clone -b master --depth 1 https://github.com/eamonxg/luci-theme-aurora.git
 
 # luci-app-nft-timecontrol
-[ -e luci-theme-timecontrol ] || git clone -b main --depth 1 https://github.com/sirpdboy/luci-app-timecontrol.git
+[ -e luci-app-timecontrol ] || git clone -b main --depth 1 https://github.com/sirpdboy/luci-app-timecontrol.git
 
 popd
 
