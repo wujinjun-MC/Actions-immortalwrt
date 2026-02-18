@@ -155,23 +155,6 @@
 
 - x86:
   1. 正在恢复的软件包
-    1. LuCI
-      1. Applications
-        - luci-app-bandix
-        - luci-app-cpu-perf
-        - luci-app-cpu-status
-        - luci-app-disks-info
-        - luci-app-dnsleaktest
-        - luci-app-interfaces-statistics
-        - luci-app-ipinfo
-        - luci-app-ipv6clientfilter
-        - luci-app-log
-        - luci-app-public-ip-monitor
-        - luci-app-sqm-autorate
-        - luci-app-temp-status
-        - luci-app-webadmin
-        - luci-mod-listening-ports
-        - luci-theme-*
 
 ### 建议
 
