@@ -47,6 +47,9 @@ rm -rf "$OPENWRT_PATH/.config"
 [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"
 [ -f $CONFIG_5G ] && cat $CONFIG_5G >> "$OPENWRT_PATH/.config"
 [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> "$OPENWRT_PATH/.config"
+## hotfix env
+export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt
+echo "export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt" >> "$SHARED_ENV"
 [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> "$OPENWRT_PATH/.config"
 if [ "$USE_LARGER"x = "true"x ]; then
     [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"
@@ -64,9 +67,7 @@ chmod +x $GITHUB_WORKSPACE/$CLASH_CORE_SH && $GITHUB_WORKSPACE/$CLASH_CORE_SH
 echo "执行 $GITHUB_WORKSPACE/$CUSTOM_SH"
 chmod +x $GITHUB_WORKSPACE/$CUSTOM_SH && $GITHUB_WORKSPACE/$CUSTOM_SH
 
-chmod +x $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh
-$GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh
-chmod +x $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh
-$GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh
+chmod +x $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh && $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh
+chmod +x $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh && $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh
 
 echo "01-prepare-env.sh success"

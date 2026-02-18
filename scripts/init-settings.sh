@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 #更改默认地址为192.168.8.1
 sed -i 's/192.168.1.1/192.168.8.1/g' package/base-files/files/bin/config_generate
@@ -22,7 +23,7 @@ HP_PATH="root/etc/homeproxy"
 
 rm -rf "${HOMEPROXY_DIR}/${HP_PATH}/resources/"*
 
-git clone -q --depth=1 --single-branch --branch "release" \
+git clone --depth=1 --single-branch --branch "release" \
   "https://github.com/Loyalsoldier/surge-rules.git" "./${HP_RULE}/"
 
 cd "./${HP_RULE}/" && RES_VER=$(git log -1 --pretty=format:'%s' | grep -o "[0-9]*")

@@ -133,6 +133,8 @@
     13. 未知
     14. 避雷 (更多可查看 `wujinjun-MC/openwrt-ci` 的 doc/test-notes.md)
       1. gnunet: 在我的机器 (j3710) 上不停出现 segfault
+      2. dhtd: 持续占用单个 CPU 核心。 请使用 BitTorrent 相关客户端维护 DHT 网络
+      3. ~~tailscale (依赖 by luci-app-tailscale{,-community}), gnunet: 日志刷屏，导致 beardropper + tail 大量 CPU 占用~~ 需要互联网连接，让服务下载需要的文件，之后就不会刷屏了
 
 ### Reasoning / 正在排查
 
@@ -143,6 +145,14 @@
         - luci-app-cpufreq: 仅适用于 arm `Depends on: arm [=n] || aarch64 [=n]`
         - ~~luci-app-lxc~~: 请打开 xz-utils (从 openwrt-ci 迁移到此项目时忘记添加)
         - ~~luci-app-quickstart~~: 请打开 xz-utils (从 openwrt-ci 迁移到此项目时忘记添加)
+
+### Pending / 即将到来
+
+- x86:
+  1. 正在恢复的软件包
+    1. LuCI
+      1. Applications
+        - luci-app-bandix, luci-app-cpu-perf, luci-app-cpu-status, luci-app-disks-info, luci-app-dnsleaktest, luci-app-interfaces-statistics, luci-app-ipinfo, luci-app-ipv6clientfilter, luci-app-log, luci-app-public-ip-monitor
 
 ### 建议
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 rm -rf package/luci/applications/luci-app-lucky
 
