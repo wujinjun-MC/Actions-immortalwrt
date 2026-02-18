@@ -60,4 +60,4 @@ CONFIG_DEVEL=y
 CONFIG_BROKEN=y
 
 # 3. Build the OpenWrt Image Builder
-#CONFIG_IB=y
+CONFIG_IB=y
