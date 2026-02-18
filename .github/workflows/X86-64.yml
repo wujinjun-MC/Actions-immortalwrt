@@ -377,6 +377,15 @@ jobs:
         include-hidden-files: true
         path: ${{ env.OPENWRT_PATH }}/.config
 
+    - name: Upload Custom Release Notes to Artifact (备份自定义发布信息到Artifact) 0
+      if: always()
+      uses: actions/upload-artifact@main
+      with:
+        name: custom_release_notes-${{ env.FIRMWARE_TAG }}.md
+        include-hidden-files: true
+        path: |
+          ${{ env.OPENWRT_PATH }}/custom_release_notes.txt
+
     - name: 空间使用情况（编译前）
       if: (!cancelled())
       run: df -hT
