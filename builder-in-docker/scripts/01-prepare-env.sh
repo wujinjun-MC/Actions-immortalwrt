@@ -10,7 +10,10 @@ echo "export FIX_VERSION_INVALID=true" >> "$SHARED_ENV"
 
 # { Checkout, 克隆源码 }
 [[ -v REPO_URL_BUILDER ]] || export REPO_URL_BUILDER="https://github.com/wujinjun-MC/openwrt-ci.git"
-git clone --depth 1 -b "$REPO_BRANCH" "$REPO_URL" openwrt
+if [ ! -e openwrt ]; then
+    git clone --depth 1 -b "$REPO_BRANCH" "$REPO_URL" openwrt
+fi
+
 export GITHUB_WORKSPACE="$(pwd)"
 echo "export GITHUB_WORKSPACE=$(pwd)" >> "$SHARED_ENV"
 cd openwrt
@@ -39,7 +42,7 @@ echo 'src-git nas_luci https://github.com/linkease/nas-packages-luci.git;main' >
 # { 导入补丁和配置 & 执行脚本 }
 cd "$GITHUB_WORKSPACE"
 [ -d files ] && cp -r files "$OPENWRT_PATH/files" || echo "files not found"
-rm 
+rm -rf "$OPENWRT_PATH/.config"
 [ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> "$OPENWRT_PATH/.config"
 [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"
 [ -f $CONFIG_5G ] && cat $CONFIG_5G >> "$OPENWRT_PATH/.config"
@@ -50,10 +53,15 @@ if [ "$USE_LARGER"x = "true"x ]; then
 fi
 chmod +x $RUST_SH && $RUST_SH
 cd "$$OPENWRT_PATH"
+echo "执行 $GITHUB_WORKSPACE/$SETTINGS_SH"
 chmod +x $GITHUB_WORKSPACE/$SETTINGS_SH && $GITHUB_WORKSPACE/$SETTINGS_SH
+echo "执行 $GITHUB_WORKSPACE/$PACKAGES_SH"
 chmod +x $GITHUB_WORKSPACE/$PACKAGES_SH && $GITHUB_WORKSPACE/$PACKAGES_SH
+echo "执行 $GITHUB_WORKSPACE/$INSTALL5G_SH"
 chmod +x $GITHUB_WORKSPACE/$INSTALL5G_SH && $GITHUB_WORKSPACE/$INSTALL5G_SH
+echo "执行 $GITHUB_WORKSPACE/$CLASH_CORE_SH"
 chmod +x $GITHUB_WORKSPACE/$CLASH_CORE_SH && $GITHUB_WORKSPACE/$CLASH_CORE_SH
+echo "执行 $GITHUB_WORKSPACE/$CUSTOM_SH"
 chmod +x $GITHUB_WORKSPACE/$CUSTOM_SH && $GITHUB_WORKSPACE/$CUSTOM_SH
 
 chmod +x $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh
