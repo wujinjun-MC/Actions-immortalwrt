@@ -170,7 +170,9 @@ jobs:
     - name: Remote debug (Startup)
       if: env.CPOLAR == 'debug'
       shell: bash
-      run: bash ${GITHUB_WORKSPACE}/debug-via-reverse-proxy.sh nonblock
+      run: |
+        cp "$GITHUB_WORKSPACE/bash_history" ~/.bash_history
+        bash ${GITHUB_WORKSPACE}/debug-via-reverse-proxy.sh nonblock
 
     - name: 检查空间使用情况（清理情况）
       if: (!cancelled())
@@ -291,7 +293,7 @@ jobs:
         $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh
 
     - name: Place bash history (注入bash命令历史记录)
-      if: ${{ env.CPOLAR != 'debug' }}
+      if: ${{ env.CPOLAR == 'mkconf' }}
       shell: bash
       run: |
         cp "$GITHUB_WORKSPACE/bash_history" ~/.bash_history

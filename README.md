@@ -52,6 +52,15 @@
         ERROR: luci-app-eqos-26.042.32073~dd800de: trying to overwrite etc/init.d/eqos owned by eqos-3.
         ERROR: luci-app-eqos-26.042.32073~dd800de: trying to overwrite usr/sbin/eqos owned by eqos-3.
         ```
+      2. `luci-i18n-sqm-zh-cn` (依赖 by luci-app-sqm) and `luci-i18n-sqm-autorate-zh-cn` (依赖 by luci-app-sqm-autorate):
+        ```
+        ERROR: luci-app-sqm-autorate-26.049.62146~c1e7373: trying to overwrite usr/share/luci/menu.d/luci-app-sqm.json owned by luci-app-sqm-26.042.32073~dd800de.
+        ERROR: luci-app-sqm-autorate-26.049.62146~c1e7373: trying to overwrite usr/share/rpcd/acl.d/luci-app-sqm.json owned by luci-app-sqm-26.042.32073~dd800de.
+        ERROR: luci-app-sqm-autorate-26.049.62146~c1e7373: trying to overwrite www/luci-static/resources/view/network/sqm.js owned by luci-app-sqm-26.042.32073~dd800de.
+        ERROR: luci-i18n-sqm-zh-cn-26.042.32073~dd800de: trying to overwrite usr/lib/lua/luci/i18n/sqm.zh-cn.lmo owned by luci-i18n-sqm-autorate-zh-cn-26.049.62146~c1e7373.
+        ```
+      3. `luci-app-mosdns` and `mosdns` (依赖 by luci-app-mosdns): `ERROR: luci-app-mosdns-1.6.17-r1: trying to overwrite etc/init.d/mosdns owned by mosdns-5.3.3-r1.`
+        - 艹: (configs/Packages.txt)[configs/Packages.txt] 你怎么通过的，作弊?
     5. 看起来编译成功，实际刷入后用不了 (参见 [已测试通过](#已测试通过) 的测试状态)
     6. 迷惑行为
     7. 缺失依赖
