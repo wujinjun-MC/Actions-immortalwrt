@@ -8,3 +8,4 @@
 /.lesshst
 .env
 /.cache
+/.cargo

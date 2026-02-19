@@ -396,25 +396,19 @@ jobs:
         echo >> $GITHUB_ENV
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
-        echo >> "$OPENWRT_PATH/build-log-nocolor.log"
         echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
-        echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-nocolor.log"
         echo >> "$OPENWRT_PATH/build-log-color.log"
-        echo >> "$OPENWRT_PATH/build-log-nocolor.log"
 
         # 第一次尝试：多线程编译
-        pipetty make -j$(( $(nproc) + 1 )) V=w 2>&1 | tee -a /dev/tty | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt >> "$OPENWRT_PATH/build-log-nocolor.log"
+        pipetty make -j$(( $(nproc) + 1 )) V=w 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
-        echo >> "$OPENWRT_PATH/build-log-nocolor.log"
         echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
-        echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-nocolor.log"
         echo >> "$OPENWRT_PATH/build-log-color.log"
-        echo >> "$OPENWRT_PATH/build-log-nocolor.log"
 
         echo "status=success" >> $GITHUB_OUTPUT
         echo "Changing CAN_UPLOAD to true" >> "$OPENWRT_PATH/build-log-color.log"
-        echo "Changing CAN_UPLOAD to true" >> "$OPENWRT_PATH/build-log-nocolor.log"
+        cat "$OPENWRT_PATH/build-log-color.log" | ansi2txt > /tmp/build-log-nocolor.log
         echo "CAN_UPLOAD=true" >> $GITHUB_ENV
         echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
@@ -428,27 +422,21 @@ jobs:
         cd $OPENWRT_PATH
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
-        echo >> "$OPENWRT_PATH/build-log-nocolor.log"
         echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
-        echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-nocolor.log"
         echo >> "$OPENWRT_PATH/build-log-color.log"
-        echo >> "$OPENWRT_PATH/build-log-nocolor.log"
 
         echo "单线程详细模式 (V=s)"
         # 单线程编译，V=s 会打印所有错误输出
         echo "compile=true" >> $GITHUB_OUTPUT
-        pipetty make -j1 V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt >> "$OPENWRT_PATH/build-log-nocolor.log"
+        pipetty make -j1 V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
-        echo >> "$OPENWRT_PATH/build-log-nocolor.log"
         echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
-        echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-nocolor.log"
         echo >> "$OPENWRT_PATH/build-log-color.log"
-        echo >> "$OPENWRT_PATH/build-log-nocolor.log"
 
         echo "status=success" >> $GITHUB_OUTPUT
         echo "Changing CAN_UPLOAD to true" >> "$OPENWRT_PATH/build-log-color.log"
-        echo "Changing CAN_UPLOAD to true" >> "$OPENWRT_PATH/build-log-nocolor.log"
+        cat "$OPENWRT_PATH/build-log-color.log" | ansi2txt > /tmp/build-log-nocolor.log
         echo "CAN_UPLOAD=true" >> $GITHUB_ENV
         echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
@@ -461,7 +449,7 @@ jobs:
         include-hidden-files: true
         path: |
           ${{ env.OPENWRT_PATH }}/build-log-color.log
-          ${{ env.OPENWRT_PATH }}/build-log-nocolor.log
+          /tmp/build-log-nocolor.log
           ${{ env.OPENWRT_PATH }}/custom_release_notes.txt
 
     # 智能检查是否编译成功，如果没有成功并运行了 Cpolar ，进入调试等待，根据用户操作确定最终是否成功
@@ -552,7 +540,7 @@ jobs:
         include-hidden-files: true
         path: |
           ${{ env.OPENWRT_PATH }}/build-log-color.log
-          ${{ env.OPENWRT_PATH }}/build-log-nocolor.log
+          /tmp/build-log-nocolor.log
           ${{ env.OPENWRT_PATH }}/custom_release_notes.txt
 
     - name: 上传 bin 目录
