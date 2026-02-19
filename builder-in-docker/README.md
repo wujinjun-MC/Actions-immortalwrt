@@ -4,7 +4,7 @@
 2. 进入此目录: `cd builder-in-docker/`
 3. 创建镜像: `docker build -t immortalwrt-builder .`
 4. 创建和进入容器: `docker run -it --name openwrt-build --network host -v ../:/home/ubuntu immortalwrt-builder:latest`
-    - 如需退出时自动删除容器 (记得复制编译产物): `docker run -it --rm --name openwrt-build --network host -v ../:/home/ubuntu immortalwrt-builder:latest`
+    - 如需退出时自动删除容器 (记得复制编译产物): `docker run -it --rm --name openwrt-build --network host -v ../:/home/ubuntu immortalwrt-builder:latest bash -l`
 5. 在容器内:
     1. 准备环境: `bash builder-in-docker/scripts/01-prepare-env.sh`
     2. 更改配置: `bash builder-in-docker/scripts/02-menuconfig.sh`
@@ -19,7 +19,7 @@
 chattr -R +C .
 cd builder-in-docker/
 docker build -t immortalwrt-builder .
-docker run -it --name openwrt-build --network host -v ../:/home/ubuntu immortalwrt-builder:latest
+docker run -it --name openwrt-build --network host -v ../:/home/ubuntu immortalwrt-builder:latest bash -l
 # In container
 bash builder-in-docker/scripts/01-prepare-env.sh
 bash builder-in-docker/scripts/02-menuconfig.sh
