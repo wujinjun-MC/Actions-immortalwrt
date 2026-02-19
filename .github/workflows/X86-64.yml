@@ -63,6 +63,10 @@ on:
         description: "自动修复插件版本号不合法 (PKG_VERSION and PKG_RELEASE)"
         default: true
         type: boolean
+      show_disk_free:
+        description: "在编译日志中每隔一段时间添加剩余空间显示 (只显示根目录剩余 `df -h /`) (只显示到 actions 输出)"
+        default: true
+        type: boolean
   # schedule:
   #  - cron: 0 20 * * 4
   #  #      分,时,日,月,周。每周五 20时执行一次 (UTC时间)
@@ -105,6 +109,7 @@ env:
   USE_CCACHE: ${{ inputs.use_ccache || true }}
   USE_LARGER: ${{ inputs.use_larger || false }}
   FIX_VERSION_INVALID: ${{ inputs.fix_version_invalid || true }}
+  SHOW_DISK_FREE: ${{ inputs.show_disk_free || false }}
 
 jobs:
   build:
@@ -394,6 +399,9 @@ jobs:
         # 记录开始编译时的时间戳
         printf "TIMESTAMP_START_COMPILE=%(%s)T" >> $GITHUB_ENV
         echo >> $GITHUB_ENV
+        if [ "$SHOW_DISK_FREE"x = "true"x ]; then
+          while true; do df -hT /; sleep 10; done &
+        fi
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
         echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
@@ -420,12 +428,17 @@ jobs:
       run: |
         set -o pipefail
         cd $OPENWRT_PATH
+        # 记录开始编译时的时间戳
+        printf "TIMESTAMP_START_COMPILE=%(%s)T" >> $GITHUB_ENV
+        echo >> $GITHUB_ENV
+        if [ "$SHOW_DISK_FREE"x = "true"x ]; then
+          while true; do df -hT /; sleep 10; done &
+        fi
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
         echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
         echo >> "$OPENWRT_PATH/build-log-color.log"
 
-        echo "单线程详细模式 (V=s)"
         # 单线程编译，V=s 会打印所有错误输出
         echo "compile=true" >> $GITHUB_OUTPUT
         pipetty make -j1 V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
