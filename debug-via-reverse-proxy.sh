@@ -1,5 +1,46 @@
 # cd /tmp
 # wget -q https://www.cpolar.com/static/downloads/releases/3.3.18/cpolar-stable-linux-amd64.zip -O cpolar.zip && unzip cpolar.zip
+# Helper function: "tcp://ip:port" to "ssh -p port ip"
+tcp_to_ssh() {
+    # 检查参数数量
+    if [ "$#" -ne 2 ]; then
+        echo "用法: tcp_to_ssh <用户名> <tcp://ip:port>"
+        return 1
+    fi
+
+    local user=$1
+    local url=$2
+    local key_option=""
+
+    # 检查环境变量 myssh_privatekey 是否存在且文件可读
+    if [[ -v myssh_privatekey ]]; then
+        echo "正在尝试使用私钥文件"
+        if [ -f "$myssh_privatekey" ]; then
+            key_option="-i $myssh_privatekey"
+        else
+            echo "警告: 私钥文件 $myssh_privatekey 未找到，将不使用私钥。"
+        fi
+    fi
+
+    # 解析 URL
+    local clean_url="${url#tcp://}"
+
+    # 提取 IP 和 端口
+    # ${clean_url%:*} 删掉最后一个冒号之后的内容 (提取IP)
+    # ${clean_url##*:} 删掉最后一个冒号之前的内容 (提取端口)
+    local ip="${clean_url%:*}"
+    local port="${clean_url##*:}"
+
+    # 如果没有端口号（即输入不包含冒号），默认设为 22
+    if [ "$ip" == "$port" ]; then
+        port=22
+    fi
+
+    # 构建命令
+    # 注意: $key_option 不需要加引号，以便在为空时被忽略
+    echo "ssh $key_option -p $port $user@$ip"
+}
+
 if ! which cpolar
 then
     while ! curl -sL https://git.io/cpolar | sed '/download_cpolar() {/a RELEASE_VERSION=latest' | sudo bash
@@ -29,7 +70,7 @@ fi
 echo "Pleased wait and check tcp tunnel on your dashboard at https://dashboard.cpolar.com/status"
 
 # echo "Remove /tmp/keep-term to continue"
-cpolar tcp 22 -daemon on -log /tmp/cpolar.log -log-level INFO &# tail -F ~/test.log &
+cpolar tcp 22 -daemon on -dashboard on -inspect-addr 0.0.0.0:4040 -log /tmp/cpolar.log -log-level INFO & # tail -F ~/test.log &
 echo "当前设置: $CPOLAR $MENUCONFIG_COLOR $CPOLAR_TOKEN_TYPE larger:$USE_LARGER single_thread:$FORCE_SINGLE_THREAD ccache:$USE_CCACHE"
 echo "echo \"当前设置: $CPOLAR $MENUCONFIG_COLOR $CPOLAR_TOKEN_TYPE larger:$USE_LARGER single_thread:$FORCE_SINGLE_THREAD ccache:$USE_CCACHE\"" >> ~/.bash_profile
 echo "$OPENWRT_PATH/custom_release_notes.txt 写你的自定义发布说明"
@@ -103,6 +144,7 @@ then
             echo "Cpolar exited, continue."
             break
         fi
+        echo "快速连接: $(tcp_to_ssh runner $(grep "Tunnel established at" /tmp/cpolar.log | tail -1 | cut -d " " -f 9 | tr -d \"))"
         sleep 10
     done
 fi
