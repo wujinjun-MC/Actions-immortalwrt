@@ -172,7 +172,8 @@ jobs:
       shell: bash
       run: |
         cp "$GITHUB_WORKSPACE/bash_history" ~/.bash_history
-        cat "$GITHUB_WORKSPACE/.bashrc" >> ~/.bash_profile
+        echo >> ~/.bash_profile
+        cat "$GITHUB_WORKSPACE/.bash_profile" >> ~/.bash_profile
         bash ${GITHUB_WORKSPACE}/debug-via-reverse-proxy.sh nonblock
 
     - name: 检查空间使用情况（清理情况）
@@ -298,7 +299,8 @@ jobs:
       shell: bash
       run: |
         cp "$GITHUB_WORKSPACE/bash_history" ~/.bash_history
-        cat "$GITHUB_WORKSPACE/.bashrc" >> ~/.bash_profile
+        echo >> ~/.bash_profile
+        cat "$GITHUB_WORKSPACE/.bash_profile" >> ~/.bash_profile
 
     # 2. 核心步骤：在编译前进入交互式 menuconfig
     - name: Remote make menuconfig (远程改配置)
