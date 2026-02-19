@@ -917,9 +917,10 @@ CONFIG_PACKAGE_kmod-r8168=y
 
 CONFIG_PACKAGE_intel-microcode=y
 
-# 2.2.3 Intel ethernet card I210/I211/I82575/I82576/...
+# 2.2.3 Intel ethernet card I210/I211//I225/I226/I82575/I82576/...
 CONFIG_PACKAGE_kmod-igb=y
 CONFIG_PACKAGE_kmod-igbvf=y
+CONFIG_PACKAGE_kmod-igbc=y
 
 # 2.2.4 Intel ethernet card generic
 CONFIG_PACKAGE_kmod-e100=y
