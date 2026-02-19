@@ -90,12 +90,12 @@ echo >> "$OPENWRT_PATH/build-log-nocolor.log"
 if [[ -v force_single_thread ]]
 then
     echo "!! Force Single Thread Mode" | tee -a "$OPENWRT_PATH/build-log-color.log"
-    echo "!! Force Single Thread Mode" | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
-    pipetty make -j1 V=w 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
+    echo "!! Force Single Thread Mode" >> "$OPENWRT_PATH/build-log-nocolor.log"
+    pipetty make -j1 V=s 2>&1 | tee -a /dev/tty | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt >> "$OPENWRT_PATH/build-log-nocolor.log"
 else
     echo "Thread: $(( $(nproc) +1 ))" | tee -a "$OPENWRT_PATH/build-log-color.log"
-    echo "Thread: $(( $(nproc) +1 ))" | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
-    pipetty make -j$(( $(nproc) + 1 )) V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
+    echo "Thread: $(( $(nproc) +1 ))" >> "$OPENWRT_PATH/build-log-nocolor.log"
+    pipetty make -j$(( $(nproc) + 1 )) V=w 2>&1 | tee -a /dev/tty | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt >> "$OPENWRT_PATH/build-log-nocolor.log"
 fi
 echo >> "$OPENWRT_PATH/build-log-color.log"
 echo >> "$OPENWRT_PATH/build-log-nocolor.log"

@@ -403,7 +403,7 @@ jobs:
         echo >> "$OPENWRT_PATH/build-log-nocolor.log"
 
         # 第一次尝试：多线程编译
-        pipetty make -j$(( $(nproc) + 1 )) V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
+        pipetty make -j$(( $(nproc) + 1 )) V=w 2>&1 | tee -a /dev/tty | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt >> "$OPENWRT_PATH/build-log-nocolor.log"
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
         echo >> "$OPENWRT_PATH/build-log-nocolor.log"
@@ -437,7 +437,7 @@ jobs:
         echo "单线程详细模式 (V=s)"
         # 单线程编译，V=s 会打印所有错误输出
         echo "compile=true" >> $GITHUB_OUTPUT
-        pipetty make -j1 V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
+        pipetty make -j1 V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt >> "$OPENWRT_PATH/build-log-nocolor.log"
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
         echo >> "$OPENWRT_PATH/build-log-nocolor.log"
