@@ -8,7 +8,7 @@
 5. 在容器内:
     1. 准备环境: `bash builder-in-docker/scripts/01-prepare-env.sh`
     2. 更改配置: `bash builder-in-docker/scripts/02-menuconfig.sh`
-    3. 编译: `bash builder-in-docker/scripts/03-compile.sh`
+    3. 编译: `cd ~/openwrt/ ; make clean ; cd ; time bash builder-in-docker/scripts/03-compile.sh`
     4. 清除准备下次编译 (deprecated: 建议重新 `git clone`): `bash builder-in-docker/scripts/04-cleanup-and-update-for-compile-again.sh`
 6. 快速停止容器: `docker stop -t 0 openwrt-build`
 
@@ -23,7 +23,7 @@ docker run -it --name openwrt-build --network host -v ../:/home/ubuntu immortalw
 # In container
 bash builder-in-docker/scripts/01-prepare-env.sh
 bash builder-in-docker/scripts/02-menuconfig.sh
-bash builder-in-docker/scripts/03-compile.sh
+cd ~/openwrt/ ; make clean ; cd ; time bash builder-in-docker/scripts/03-compile.sh
 bash builder-in-docker/scripts/04-cleanup-and-update-for-compile-again.sh
 ```
 
