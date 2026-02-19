@@ -43,17 +43,20 @@ grep "linkease/nas-packages-luci.git" feeds.conf.default || sed -i '$a src-git n
 cd "$GITHUB_WORKSPACE"
 [ -d files ] && cp -r files "$OPENWRT_PATH/files" || echo "files not found"
 rm -rf "$OPENWRT_PATH/.config"
-[ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> "$OPENWRT_PATH/.config"
-[ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"
-[ -f $CONFIG_5G ] && cat $CONFIG_5G >> "$OPENWRT_PATH/.config"
-[ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> "$OPENWRT_PATH/.config"
-## hotfix env
+    # [ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> "$OPENWRT_PATH/.config"
+    # [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"
+    # [ -f $CONFIG_5G ] && cat $CONFIG_5G >> "$OPENWRT_PATH/.config"
+    # [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> "$OPENWRT_PATH/.config"
+    # ## hotfix env
+    # export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt
+    # echo "export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt" >> "$SHARED_ENV"
+    # [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> "$OPENWRT_PATH/.config"
+    # if [ "$USE_LARGER"x = "true"x ]; then
+    #     [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"
+    # fi
 export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt
 echo "export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt" >> "$SHARED_ENV"
-[ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> "$OPENWRT_PATH/.config"
-if [ "$USE_LARGER"x = "true"x ]; then
-    [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"
-fi
+[ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_5G ] && cat $CONFIG_5G >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"
 chmod +x $RUST_SH && $RUST_SH
 cd "$OPENWRT_PATH"
 echo "执行 $GITHUB_WORKSPACE/$SETTINGS_SH"
