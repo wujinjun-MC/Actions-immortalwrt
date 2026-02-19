@@ -80,21 +80,29 @@ cd "$OPENWRT_PATH"
 # 记录开始编译时的时间戳
 export TIMESTAMP_START_COMPILE=$(printf "%(%s)T")
 
-echo >> "$OPENWRT_PATH/build-log.log"
-echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
-echo >> "$OPENWRT_PATH/build-log.log"
+echo >> "$OPENWRT_PATH/build-log-color.log"
+echo >> "$OPENWRT_PATH/build-log-nocolor.log"
+echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
+echo "-------- Start building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-nocolor.log"
+echo >> "$OPENWRT_PATH/build-log-color.log"
+echo >> "$OPENWRT_PATH/build-log-nocolor.log"
 # 多线程编译 或 单线程编译
 if [[ -v force_single_thread ]]
 then
-    echo "!! Force Single Thread Mode" | tee -a "$OPENWRT_PATH/build-log.log"
-    make -j1 V=w 2>&1 | tee -a "$OPENWRT_PATH/build-log.log"
+    echo "!! Force Single Thread Mode" | tee -a "$OPENWRT_PATH/build-log-color.log"
+    echo "!! Force Single Thread Mode" | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
+    pipetty make -j1 V=w 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
 else
-    echo "Thread: $(( $(nproc) +1 ))" | tee -a "$OPENWRT_PATH/build-log.log"
-    make -j$(( $(nproc) + 1 )) V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log.log"
+    echo "Thread: $(( $(nproc) +1 ))" | tee -a "$OPENWRT_PATH/build-log-color.log"
+    echo "Thread: $(( $(nproc) +1 ))" | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
+    pipetty make -j$(( $(nproc) + 1 )) V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" | ansi2txt | tee -a "$OPENWRT_PATH/build-log-nocolor.log"
 fi
-echo >> "$OPENWRT_PATH/build-log.log"
-echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log.log"
-echo >> "$OPENWRT_PATH/build-log.log"
+echo >> "$OPENWRT_PATH/build-log-color.log"
+echo >> "$OPENWRT_PATH/build-log-nocolor.log"
+echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
+echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-nocolor.log"
+echo >> "$OPENWRT_PATH/build-log-color.log"
+echo >> "$OPENWRT_PATH/build-log-nocolor.log"
 
 # 编译结果位于 bin/targets
 ls bin/targets/*/*
