@@ -116,7 +116,7 @@ env:
   FORCE_SINGLE_THREAD: ${{ inputs.force_single_thread || false }}
   USE_CCACHE: ${{ inputs.use_ccache || true }}
   USE_WUJINJUN: ${{ inputs.use_wujinjun || true}}
-  USE_OTHERS: ${{ inputs.use_others || false }}
+  USE_OTHERS: ${{ inputs.use_others || true }}
   USE_LARGER: ${{ inputs.use_larger || false }}
   FIX_VERSION_INVALID: ${{ inputs.fix_version_invalid || true }}
   SHOW_DISK_FREE: ${{ inputs.show_disk_free || false }}
