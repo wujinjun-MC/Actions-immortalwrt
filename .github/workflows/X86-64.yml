@@ -425,7 +425,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@main
       with:
-        name: custom_release_notes-${{ env.FIRMWARE_TAG }}.md
+        name: custom_release_notes-${{ env.FIRMWARE_TAG }}
         include-hidden-files: true
         path: |
           ${{ env.OPENWRT_PATH }}/custom_release_notes.txt
@@ -510,15 +510,16 @@ jobs:
       run: |
         cat "$OPENWRT_PATH/build-log-color.log" | ansi2txt > /tmp/build-log-nocolor.log
 
-    - name: Upload Build Log and Custom Release Notes to Artifact (备份编译日志和自定义发布信息到Artifact) 1
+    - name: Upload Build Log, Disk Free Record, Custom Release Notes to Artifact (备份编译日志,存储剩余记录,自定义发布信息到Artifact) 1
       if: always()
       uses: actions/upload-artifact@main
       with:
-        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-1.log
+        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-1
         include-hidden-files: true
         path: |
           ${{ env.OPENWRT_PATH }}/build-log-color.log
           /tmp/build-log-nocolor.log
+          /tmp/disk-usage.txt
           ${{ env.OPENWRT_PATH }}/custom_release_notes.txt
 
     # 智能检查是否编译成功，如果没有成功并运行了 Cpolar ，进入调试等待，根据用户操作确定最终是否成功
@@ -601,15 +602,16 @@ jobs:
       if: (!cancelled())
       run: df -hT
 
-    - name: Upload Build Log and Custom Release Notes to Artifact (备份编译日志和自定义发布信息到Artifact) 2
+    - name: Upload Build Log, Disk Free Record, Custom Release Notes to Artifact (备份编译日志,存储剩余记录,自定义发布信息到Artifact) 2
       if: always()
       uses: actions/upload-artifact@main
       with:
-        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-2.log
+        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-2
         include-hidden-files: true
         path: |
           ${{ env.OPENWRT_PATH }}/build-log-color.log
           /tmp/build-log-nocolor.log
+          /tmp/disk-usage.txt
           ${{ env.OPENWRT_PATH }}/custom_release_notes.txt
 
     - name: 上传 bin 目录
