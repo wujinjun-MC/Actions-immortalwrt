@@ -463,7 +463,7 @@ jobs:
 
         # 单线程编译，V=s 会打印所有错误输出
         echo "compile=true" >> $GITHUB_OUTPUT
-        unbuffer make -j1 V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
+        unbuffer make -j1 V=sc 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
         echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
