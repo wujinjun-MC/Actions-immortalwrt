@@ -110,16 +110,16 @@ env:
   CPOLAR_TOKEN_2: ${{ secrets.CPOLAR_TOKEN_2 }}
   CPOLAR_TOKEN_3: ${{ secrets.CPOLAR_TOKEN_3 }}
   # Workflow dispatch 变量
-  CPOLAR: ${{ inputs.debug_or_make_config || 'none' }}
-  MENUCONFIG_COLOR: ${{ inputs.menuconfig_color || 'bluetitle' }}
-  CPOLAR_TOKEN_TYPE: ${{ inputs.cpolar_token_type || 'TOKEN_1' }}
-  FORCE_SINGLE_THREAD: ${{ inputs.force_single_thread || false }}
-  USE_CCACHE: ${{ inputs.use_ccache || true }}
-  USE_WUJINJUN: ${{ inputs.use_wujinjun || true }}
-  USE_OTHERS: ${{ inputs.use_others || true }}
-  USE_LARGER: ${{ inputs.use_larger || false }}
-  FIX_VERSION_INVALID: ${{ inputs.fix_version_invalid || true }}
-  SHOW_DISK_FREE: ${{ inputs.show_disk_free || false }}
+  CPOLAR: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_or_make_config || 'none' }}
+  MENUCONFIG_COLOR: ${{ github.event_name == 'workflow_dispatch' && inputs.menuconfig_color || 'bluetitle' }}
+  CPOLAR_TOKEN_TYPE: ${{ github.event_name == 'workflow_dispatch' && inputs.cpolar_token_type || 'TOKEN_1' }}
+  FORCE_SINGLE_THREAD: ${{ github.event_name == 'workflow_dispatch' && inputs.force_single_thread || 'false' }}
+  USE_CCACHE: ${{ github.event_name == 'workflow_dispatch' && inputs.use_ccache || 'true' }}
+  USE_WUJINJUN: ${{ github.event_name == 'workflow_dispatch' && inputs.use_wujinjun || 'true' }}
+  USE_OTHERS: ${{ github.event_name == 'workflow_dispatch' && inputs.use_others || 'true' }}
+  USE_LARGER: ${{ github.event_name == 'workflow_dispatch' && inputs.use_larger || 'false' }}
+  FIX_VERSION_INVALID: ${{ github.event_name == 'workflow_dispatch' && inputs.fix_version_invalid || 'true' }}
+  SHOW_DISK_FREE: ${{ github.event_name == 'workflow_dispatch' && inputs.show_disk_free || 'false' }}
 
 jobs:
   build:
