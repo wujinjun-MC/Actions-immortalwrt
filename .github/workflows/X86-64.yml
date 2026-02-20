@@ -179,6 +179,8 @@ jobs:
         cp "$GITHUB_WORKSPACE/bash_history" ~/.bash_history
         echo >> ~/.bash_profile
         cat "$GITHUB_WORKSPACE/.bash_profile" >> ~/.bash_profile
+        cat "$GITHUB_WORKSPACE/.tmux.conf" >> ~/.tmux.conf
+        cat "$GITHUB_WORKSPACE/.tmux.switch-client.sh" >> ~/.tmux.switch-client.sh && chmod 755 ~/.tmux.switch-client.sh
         bash ${GITHUB_WORKSPACE}/debug-via-reverse-proxy.sh nonblock
 
     - name: 检查空间使用情况（清理情况）
@@ -299,13 +301,15 @@ jobs:
         chmod +x $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh
         $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh
 
-    - name: Place bash history and bash rc (注入bash命令历史记录和 rc)
+    - name: Place bash history and bash rc (注入bash命令历史记录, rc, tmux.conf, tmux.switch-client.sh)
       if: ${{ env.CPOLAR == 'mkconf' }}
       shell: bash
       run: |
         cp "$GITHUB_WORKSPACE/bash_history" ~/.bash_history
         echo >> ~/.bash_profile
         cat "$GITHUB_WORKSPACE/.bash_profile" >> ~/.bash_profile
+        cat "$GITHUB_WORKSPACE/.tmux.conf" >> ~/.tmux.conf
+        cat "$GITHUB_WORKSPACE/.tmux.switch-client.sh" >> ~/.tmux.switch-client.sh && chmod 755 ~/.tmux.switch-client.sh
 
     # 2. 核心步骤：在编译前进入交互式 menuconfig
     - name: Remote make menuconfig (远程改配置)
@@ -400,7 +404,11 @@ jobs:
         printf "TIMESTAMP_START_COMPILE=%(%s)T" >> $GITHUB_ENV
         echo >> $GITHUB_ENV
         if [ "$SHOW_DISK_FREE"x = "true"x ]; then
-          while true; do df -hT /; sleep 10; done &
+          while true; do
+            date +"%Y-%m-%d %H:%M:%S" | tee -a /tmp/disk-usage.txt
+            df -hT / | tail -1 | tee -a /tmp/disk-usage.txt
+            sleep 10
+          done &
         fi
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
@@ -408,7 +416,7 @@ jobs:
         echo >> "$OPENWRT_PATH/build-log-color.log"
 
         # 第一次尝试：多线程编译
-        pipetty make -j$(( $(nproc) + 1 )) V=w 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
+        unbuffer make -j$(( $(nproc) + 1 )) V=w 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
         echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
@@ -416,7 +424,7 @@ jobs:
 
         echo "status=success" >> $GITHUB_OUTPUT
         echo "Changing CAN_UPLOAD to true" >> "$OPENWRT_PATH/build-log-color.log"
-        cat "$OPENWRT_PATH/build-log-color.log" | ansi2txt > /tmp/build-log-nocolor.log
+        #cat "$OPENWRT_PATH/build-log-color.log" | ansi2txt > /tmp/build-log-nocolor.log
         echo "CAN_UPLOAD=true" >> $GITHUB_ENV
         echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
@@ -424,7 +432,7 @@ jobs:
     - name: Compile Firmware Single Thread with Verbosity (单线程详细模式)
       id: compile_j1  
       if: ${{ env.FORCE_SINGLE_THREAD == 'true' }}
-      continue-on-error: true # 允许此步失败，以便触发下方的重试逻辑
+      continue-on-error: true
       run: |
         set -o pipefail
         cd $OPENWRT_PATH
@@ -441,7 +449,7 @@ jobs:
 
         # 单线程编译，V=s 会打印所有错误输出
         echo "compile=true" >> $GITHUB_OUTPUT
-        pipetty make -j1 V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
+        unbuffer make -j1 V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
         echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
@@ -449,10 +457,16 @@ jobs:
 
         echo "status=success" >> $GITHUB_OUTPUT
         echo "Changing CAN_UPLOAD to true" >> "$OPENWRT_PATH/build-log-color.log"
-        cat "$OPENWRT_PATH/build-log-color.log" | ansi2txt > /tmp/build-log-nocolor.log
+        #cat "$OPENWRT_PATH/build-log-color.log" | ansi2txt > /tmp/build-log-nocolor.log
         echo "CAN_UPLOAD=true" >> $GITHUB_ENV
         echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+
+    - name: Log de-colorize (Log 去颜色)
+      if: always()
+      continue-on-error: true
+      run: |
+        cat "$OPENWRT_PATH/build-log-color.log" | ansi2txt > /tmp/build-log-nocolor.log
 
     - name: Upload Build Log and Custom Release Notes to Artifact (备份编译日志和自定义发布信息到Artifact) 1
       if: always()
