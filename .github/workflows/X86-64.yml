@@ -112,16 +112,32 @@ env:
   # Workflow dispatch 变量
   ## 需要使用 !contains(inputs.xxx, 'true/false') 判断布尔值，以避免一直 true。
   ### https://stackoverflow.com/questions/72539900/schedule-trigger-github-action-workflow-with-input-parameters
-  CPOLAR: ${{ !contains(inputs.debug_or_make_config, 'none') }}
-  MENUCONFIG_COLOR: ${{ !contains(inputs.menuconfig_color, 'bluetitle') }}
-  CPOLAR_TOKEN_TYPE: ${{ !contains(inputs.cpolar_token_type, 'TOKEN_1') }}
-  FORCE_SINGLE_THREAD: ${{ !contains(inputs.force_single_thread, 'false') }}
-  USE_CCACHE: ${{ !contains(inputs.use_ccache, 'true') }}
-  USE_WUJINJUN: ${{ !contains(inputs.use_wujinjun, 'true') }}
-  USE_OTHERS: ${{ !contains(inputs.use_others, 'true') }}
-  USE_LARGER: ${{ !contains(inputs.use_larger, 'false') }}
-  FIX_VERSION_INVALID: ${{ !contains(inputs.fix_version_invalid, 'true') }}
-  SHOW_DISK_FREE: ${{ !contains(inputs.show_disk_free, 'false') }}
+  CPOLAR: ${{ inputs.debug_or_make_config || 'none' }}
+  MENUCONFIG_COLOR: ${{ inputs.menuconfig_color || 'bluetitle' }}
+  CPOLAR_TOKEN_TYPE: ${{ inputs.cpolar_token_type || 'TOKEN_1' }}
+  FORCE_SINGLE_THREAD: ${{ inputs.force_single_thread || 'false' }}
+  USE_CCACHE: |-
+    ${{ case(
+      github.event_name == 'workflow_dispatch', inputs.use_ccache,
+      'true'
+    ) }}
+  USE_WUJINJUN: |-
+    ${{ case(
+      github.event_name == 'workflow_dispatch', inputs.use_wujinjun,
+      'true'
+    ) }}
+  USE_OTHERS: |-
+    ${{ case(
+      github.event_name == 'workflow_dispatch', inputs.use_others,
+      'true'
+    ) }}
+  USE_LARGER: ${{ inputs.use_larger || 'false' }}
+  FIX_VERSION_INVALID: |-
+    ${{ case(
+      github.event_name == 'workflow_dispatch', inputs.fix_version_invalid,
+      'true'
+    ) }}
+  SHOW_DISK_FREE: ${{ inputs.show_disk_free || 'false' }}
 
 jobs:
   build:
