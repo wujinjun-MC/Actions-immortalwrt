@@ -115,7 +115,7 @@ env:
   CPOLAR_TOKEN_TYPE: ${{ inputs.cpolar_token_type || 'TOKEN_1' }}
   FORCE_SINGLE_THREAD: ${{ inputs.force_single_thread || false }}
   USE_CCACHE: ${{ inputs.use_ccache || true }}
-  USE_WUJINJUN: ${{ inputs.use_wujinjun || true}}
+  USE_WUJINJUN: ${{ inputs.use_wujinjun || true }}
   USE_OTHERS: ${{ inputs.use_others || true }}
   USE_LARGER: ${{ inputs.use_larger || false }}
   FIX_VERSION_INVALID: ${{ inputs.fix_version_invalid || true }}
@@ -294,12 +294,15 @@ jobs:
         [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> openwrt/.config
         [ -f $CONFIG_5G ] && cat $CONFIG_5G >> openwrt/.config
         if [ "$USE_WUJINJUN"x = "true"x ]; then
+          echo "USE_WUJINJUN = true, add $CONFIG_WUJINJUN"
           [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> openwrt/.config
         fi
         if [ "$USE_OTHERS"x = "true"x ]; then
+          echo "USE_OTHERS = true, add $CONFIG_WUJINJUN_OTHERS"
           [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> openwrt/.config
         fi
         if [ "$USE_LARGER"x = "true"x ]; then
+          echo "USE_LARGER = true, add $CONFIG_WUJINJUN_LARGER"
           [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> openwrt/.config
         fi
         chmod +x $RUST_SH && $RUST_SH
