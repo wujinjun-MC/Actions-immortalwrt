@@ -389,6 +389,13 @@ jobs:
           echo "ENABLED_CCACHE=false" >> $GITHUB_ENV
         fi
 
+    - name: Backup Cpolar Log to Artifact (备份 Cpolar log 到Artifact)
+      uses: actions/upload-artifact@main
+      with:
+        name: cpolar-log
+        include-hidden-files: true
+        path: /tmp/cpolar.log
+
     - name: Backup Config to Artifact (备份配置到Artifact)
       uses: actions/upload-artifact@main
       with:
