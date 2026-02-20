@@ -71,8 +71,8 @@ echo "Pleased wait and check tcp tunnel on your dashboard at https://dashboard.c
 
 # echo "Remove /tmp/keep-term to continue"
 cpolar tcp 22 -daemon on -dashboard on -inspect-addr 0.0.0.0:4040 -log /tmp/cpolar.log -log-level INFO & # tail -F ~/test.log &
-echo "当前设置: $CPOLAR $MENUCONFIG_COLOR $CPOLAR_TOKEN_TYPE larger:$USE_LARGER single_thread:$FORCE_SINGLE_THREAD ccache:$USE_CCACHE"
-echo "echo \"当前设置: $CPOLAR $MENUCONFIG_COLOR $CPOLAR_TOKEN_TYPE larger:$USE_LARGER single_thread:$FORCE_SINGLE_THREAD ccache:$USE_CCACHE\"" >> ~/.bash_profile
+echo "当前设置: $CPOLAR $MENUCONFIG_COLOR $CPOLAR_TOKEN_TYPE wujinjun:$USE_WUJINJUN larger:$USE_LARGER single_thread:$FORCE_SINGLE_THREAD ccache:$USE_CCACHE"
+echo "echo \"当前设置: $CPOLAR $MENUCONFIG_COLOR $CPOLAR_TOKEN_TYPE wujinjun|others|larger:${USE_WUJINJUN}|${USE_OTHERS}|${USE_LARGER} single_thread:$FORCE_SINGLE_THREAD ccache:$USE_CCACHE\"" >> ~/.bash_profile
 echo "$OPENWRT_PATH/custom_release_notes.txt 写你的自定义发布说明"
 echo "echo $OPENWRT_PATH/custom_release_notes.txt 写你的自定义发布说明" >> ~/.bash_profile
 

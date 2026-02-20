@@ -13,7 +13,7 @@ name: X86-64
 permissions: write-all
 #开启写权限，防止无法上传到release
 
-run-name: "x86-64 ${{ inputs.debug_or_make_config }} ${{ inputs.cpolar_token_type }} larger:${{ inputs.use_larger }} single_thread:${{ inputs.force_single_thread }} ccache:${{ inputs.use_ccache }}"
+run-name: "x86-64 ${{ inputs.debug_or_make_config }} ${{ inputs.cpolar_token_type }} wujinjun|others|larger:${{ inputs.use_wujinjun }}|${{ inputs.use_others }}|${{ inputs.use_larger }} single_thread:${{ inputs.force_single_thread }} ccache:${{ inputs.use_ccache }}"
 
 on:
   # repository_dispatch:
@@ -55,8 +55,16 @@ on:
         description: "使用 ccache 加速编译"
         default: true
         type: boolean
+      use_wujinjun:
+        description: "使用 wujinjun 的软件包"
+        default: true
+        type: boolean
+      use_others:
+        description: "使用 wujinjun 的其他软件包 (Others-)"
+        default: true
+        type: boolean
       use_larger:
-        description: "使用更多软件包 (-larger)"
+        description: "使用 wujinjun 的更多软件包 (-larger)"
         default: false
         type: boolean
       fix_version_invalid:
@@ -107,6 +115,8 @@ env:
   CPOLAR_TOKEN_TYPE: ${{ inputs.cpolar_token_type || 'TOKEN_1' }}
   FORCE_SINGLE_THREAD: ${{ inputs.force_single_thread || false }}
   USE_CCACHE: ${{ inputs.use_ccache || true }}
+  USE_WUJINJUN: ${{ inputs.use_wujinjun || true}}
+  USE_OTHERS: ${{ inputs.use_others || false }}
   USE_LARGER: ${{ inputs.use_larger || false }}
   FIX_VERSION_INVALID: ${{ inputs.fix_version_invalid || true }}
   SHOW_DISK_FREE: ${{ inputs.show_disk_free || false }}
@@ -283,8 +293,12 @@ jobs:
         [ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> openwrt/.config
         [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> openwrt/.config
         [ -f $CONFIG_5G ] && cat $CONFIG_5G >> openwrt/.config
-        [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> openwrt/.config
-        [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> openwrt/.config
+        if [ "$USE_WUJINJUN"x = "true"x ]; then
+          [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> openwrt/.config
+        fi
+        if [ "$USE_OTHERS"x = "true"x ]; then
+          [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> openwrt/.config
+        fi
         if [ "$USE_LARGER"x = "true"x ]; then
           [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> openwrt/.config
         fi
@@ -622,7 +636,7 @@ jobs:
         echo "- 🔗 源码版本: [${{ env.SHORT_COMMIT_BUILDER }}](${{ env.REPO_URL_BUILDER }}/commit/${{ env.COMMIT_HASH_BUILDER }})" >> release.txt
         echo "- 🚀 本次运行 Workflow: [#${{ github.run_number }} (${{ github.run_id }})](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> release.txt
         echo "- 🛠️ Workflow 定义文件: [${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/X86-64.yml)" >> release.txt
-        echo "- ⚙️ Workflow 变量 / 动态名称: x86-64 ${{ env.CPOLAR }} ${{ env.CPOLAR_TOKEN_TYPE }} larger:${{ env.USE_LARGER }} single_thread:${{ env.FORCE_SINGLE_THREAD }} ccache:${{ env.USE_CCACHE }}"
+        echo "- ⚙️ Workflow 变量 / 动态名称: x86-64 ${{ env.CPOLAR }} ${{ env.CPOLAR_TOKEN_TYPE }} wujinjun|others|larger:${{ env.USE_WUJINJUN }}|${{ env.USE_OTHERS }}|${{ env.USE_LARGER }} single_thread:${{ env.FORCE_SINGLE_THREAD }} ccache:${{ env.USE_CCACHE }}"
         echo "### 📒 固件信息(WIFI)" >> release.txt
         echo "- x86_64的固件" >> release.txt
         echo "- 💻 这是 (x86_64) 平台使用的 OpenWrt 固件" >> release.txt
