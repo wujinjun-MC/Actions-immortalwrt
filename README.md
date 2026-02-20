@@ -44,6 +44,31 @@
     1. `ERROR: info field 'version' has invalid value: package version is invalid` (可能因为OpenWRT官方从OPKG换成apk,部分软件包未适配，请耐心等待) (如果急需这些软件包，需要在新增actions run时开启 `fix_version_invalid` / 本地Docker编译时设置 `FIX_VERSION_INVALID=true` 。将会使用overwrite遍历修复版本号(可能会导致其他正常软件包的版本号被修改))
     2. 内核不兼容
     3. 源码有bug
+      1. ~~`libubox` (依赖 by (自己看，太多了))~~:
+        ```
+        FAILED: [code=1] CMakeFiles/ubox.dir/avl-cmp.c.o 
+        /workdir/openwrt/staging_dir/host/bin/ccache /workdir/openwrt/staging_dir/toolchain-x86_64_gcc-14.3.0_musl/bin/x86_64-openwrt-linux-musl-gcc -Dubox_EXPORTS -I/workdir/openwrt/staging_dir/target-x86_64_musl/usr/include/json-c -Os -pipe -fno-caller-saves -fno-plt -fhonour-copts -fmacro-prefix-map=/workdir/openwrt/build_dir/target-x86_64_musl/libubox-2026.02.13~1aa36ee7=libubox-2026.02.13~1aa36ee7 -Wformat -Werror=format-security -fstack-protector -D_FORTIFY_SOURCE=1 -Wl,-z,now -Wl,-z,relro -Wl,-z,pack-relative-relocs -I/workdir/openwrt/staging_dir/target-x86_64_musl/usr/include  -I/workdir/openwrt/staging_dir/toolchain-x86_64_gcc-14.3.0_musl/usr/include -I/workdir/openwrt/staging_dir/toolchain-x86_64_gcc-14.3.0_musl/include -I/workdir/openwrt/staging_dir/toolchain-x86_64_gcc-14.3.0_musl/include/fortify -DNDEBUG -fPIC   -Wall -Werror -Wextra -Werror=implicit-function-declaration -Wformat -Werror=format-security -Werror=format-nonliteral -Os -std=gnu99 -g3 -Wmissing-declarations -Wno-unused-parameter -MD -MT CMakeFiles/ubox.dir/avl-cmp.c.o -MF CMakeFiles/ubox.dir/avl-cmp.c.o.d -o CMakeFiles/ubox.dir/avl-cmp.c.o -c '/workdir/openwrt/build_dir/target-x86_64_musl/libubox-2026.02.13~1aa36ee7/avl-cmp.c'
+        In file included from blob.h:26,
+                        from avl-cmp.c:18:
+        ../../../staging_dir/toolchain-x86_64_gcc-14.3.0_musl/include/fortify/stdio.h: In function 'snprintf':
+        ../../../staging_dir/toolchain-x86_64_gcc-14.3.0_musl/include/fortify/stdio.h:101:9: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
+          101 |         return __orig_snprintf(__s, __n, __f, __builtin_va_arg_pack());
+              |         ^~~~~~
+        ../../../staging_dir/toolchain-x86_64_gcc-14.3.0_musl/include/fortify/stdio.h: In function 'sprintf':
+        ../../../staging_dir/toolchain-x86_64_gcc-14.3.0_musl/include/fortify/stdio.h:110:17: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
+          110 |                 __r = __orig_snprintf(__s, __b, __f, __builtin_va_arg_pack());
+              |                 ^~~
+        ../../../staging_dir/toolchain-x86_64_gcc-14.3.0_musl/include/fortify/stdio.h:114:17: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
+          114 |                 __r = __orig_sprintf(__s, __f, __builtin_va_arg_pack());
+              |                 ^~~
+        cc1: all warnings being treated as errors
+        ninja: build stopped: subcommand failed.
+        make[3]: *** [Makefile:119: /workdir/openwrt/build_dir/target-x86_64_musl/libubox-2026.02.13~1aa36ee7/.built] Error 1
+        make[3]: Leaving directory '/workdir/openwrt/package/libs/libubox'
+        time: package/libs/libubox/compile#0.46#0.33#0.74
+            ERROR: package/libs/libubox failed to build.
+        make[2]: *** [package/Makefile:188: package/libs/libubox/compile] Error 1
+        ```
     4. 冲突
       1. `luci-app-eqos` and `eqos-3` (无中生包? config 里面根本没有):
         ```
