@@ -315,7 +315,7 @@ jobs:
         [ -d files ] && mv files openwrt/files || echo "files not found"
         [ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> openwrt/.config
         [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> openwrt/.config
-        [ -f $CONFIG_5G ] && cat $CONFIG_5G >> openwrt/.config
+        #[ -f $CONFIG_5G ] && cat $CONFIG_5G >> openwrt/.config
         if [ "$USE_WUJINJUN"x = "true"x ]; then
           echo "USE_WUJINJUN = true, add $CONFIG_WUJINJUN"
           [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> openwrt/.config
