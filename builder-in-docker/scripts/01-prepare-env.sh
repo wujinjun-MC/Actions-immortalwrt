@@ -9,7 +9,7 @@ export FIX_VERSION_INVALID=true
 echo "export FIX_VERSION_INVALID=true" >> "$SHARED_ENV"
 
 # { Checkout, 克隆源码 }
-[[ -v REPO_URL_BUILDER ]] || export REPO_URL_BUILDER="https://github.com/wujinjun-MC/openwrt-ci.git"
+[[ -v REPO_URL_BUILDER ]] || export REPO_URL_BUILDER="https://github.com/wujinjun-MC/Actions-immortalwrt"
 if [ ! -e openwrt ]; then
     git clone --depth 1 -b "$REPO_BRANCH" "$REPO_URL" openwrt
 fi
