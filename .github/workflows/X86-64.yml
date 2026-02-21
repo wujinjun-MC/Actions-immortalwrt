@@ -174,7 +174,7 @@ jobs:
         sudo -E apt-get -qq update -y
         sudo -E apt-get -qq full-upgrade -y
         sudo bash -c 'bash <(curl -sL https://build-scripts.immortalwrt.org/init_build_environment.sh)'
-        sudo -E apt -yqq install dos2unix libfuse-dev ccache mkisofs ncdu btop colorized-logs expect 
+        sudo -E apt -yqq install dos2unix libfuse-dev ccache mkisofs ncdu btop colorized-logs expect safe-rm 
         chmod +x $ENV_SH && $ENV_SH
         sudo rm -rf /var/lib/apt/lists/*
         sudo -E apt -yqq autoremove --purge
