@@ -23,7 +23,8 @@ RUN rm -rf /var/lib/apt/lists/*
 ENV TZ=Asia/Shanghai
 ENV REPO_URL_BUILDER=https://github.com/wujinjun-MC/Actions-immortalwrt
 ENV REPO_URL=https://github.com/immortalwrt/immortalwrt
-ENV REPO_BRANCH=openwrt-25.12
+#ENV REPO_BRANCH=openwrt-25.12
+ENV REPO_BRANCH=master
 ENV PLATFORM_FILE=configs/Target-X86.txt
 ENV CONFIG_FILE=configs/Packages.txt
 ENV CONFIG_5G=configs/Packages-5G.txt
