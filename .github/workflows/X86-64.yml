@@ -469,7 +469,7 @@ jobs:
         echo >> "$OPENWRT_PATH/build-log-color.log"
 
         # 第一次尝试：多线程编译
-        unbuffer make -j$(( $(nproc) + 1 )) V=w 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
+        unbuffer make -j$(( $(nproc) + 1 )) V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
         echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"
