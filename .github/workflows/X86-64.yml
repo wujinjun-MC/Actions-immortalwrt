@@ -220,6 +220,11 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
+    - name: 记录所有编译步骤启动前的存储占用
+      run: |
+        echo "DISK_USAGE_BEFORE_ALL_HUMAN=$(df -h /workdir | tail -n 1 |  awk '{print $3}')" >> $GITHUB_ENV
+        echo "DISK_USAGE_BEFORE_ALL_ORIGIN=$(df /workdir | tail -n 1 |  awk '{print $3}')" >> $GITHUB_ENV
+
     - name: 克隆源码
       working-directory: /workdir
       run: |
@@ -434,6 +439,11 @@ jobs:
       if: (!cancelled())
       run: df -hT
 
+    - name: 记录开始编译前的存储占用
+      run: |
+        echo "DISK_USAGE_BEFORE_BUILD_HUMAN=$(df -h /workdir | tail -n 1 |  awk '{print $3}')" >> $GITHUB_ENV
+        echo "DISK_USAGE_BEFORE_BUILD_ORIGIN=$(df /workdir | tail -n 1 |  awk '{print $3}')" >> $GITHUB_ENV
+
     - name: Compile Firmware (多线程尝试)
       id: compile
       if: ${{ env.FORCE_SINGLE_THREAD == 'false' }}
@@ -621,6 +631,11 @@ jobs:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}.zip
         path: openwrt/bin
 
+    - name: 记录编译完成后的存储占用
+      run: |
+        echo "DISK_USAGE_AFTER_BUILD_HUMAN=$(df -h /workdir | tail -n 1 |  awk '{print $3}')" >> $GITHUB_ENV
+        echo "DISK_USAGE_AFTER_BUILD_ORIGIN=$(df /workdir | tail -n 1 |  awk '{print $3}')" >> $GITHUB_ENV
+
     - name: 整理文件
       id: organize
       if: env.CAN_UPLOAD == 'true' && !cancelled()
@@ -651,6 +666,11 @@ jobs:
         echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
+    - name: 记录整理文件后的存储占用
+      run: |
+        echo "DISK_USAGE_AFTER_ORGANIZE_HUMAN=$(df -h /workdir | tail -n 1 |  awk '{print $3}')" >> $GITHUB_ENV
+        echo "DISK_USAGE_AFTER_ORGANIZE_ORIGIN=$(df /workdir | tail -n 1 |  awk '{print $3}')" >> $GITHUB_ENV
+
     - name: 上传固件目录
       uses: actions/upload-artifact@main
       if: env.UPLOAD_FIRMWARE == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
@@ -680,6 +700,23 @@ jobs:
         echo "- 固件内核版本：${{ env.VERSION_KERNEL }}" >> release.txt
         echo "- 固件编译前最后一次➦[主源码](${{ env.REPO_URL }})更新记录:" >> release.txt
         echo "  - ${{ env.VERSION_INFO }}" >> release.txt
+        echo "### 存储占用记录" >> release.txt
+        echo "<details>" >> release.txt
+        echo >> release.txt
+
+        echo "<summary>点击展开</summary>" >> release.txt
+        echo >> release.txt
+
+        echo "所有步骤开始前: $DISK_USAGE_BEFORE_ALL_HUMAN ($DISK_USAGE_BEFORE_ALL_ORIGIN)" >> release.txt
+        echo >> release.txt
+        echo "编译开始前: $DISK_USAGE_BEFORE_BUILD_HUMAN ($DISK_USAGE_BEFORE_BUILD_ORIGIN)" >> release.txt
+        echo >> release.txt
+        echo "编译完成后: $DISK_USAGE_AFTER_BUILD_HUMAN ($DISK_USAGE_AFTER_BUILD_ORIGIN)" >> release.txt
+        echo >> release.txt
+        echo "整理文件后: $DISK_USAGE_AFTER_ORGANIZE_HUMAN ($DISK_USAGE_AFTER_ORGANIZE_ORIGIN)" >> release.txt
+        echo >> release.txt
+
+        echo "</details>" >> release.txt
         if [ -e "$OPENWRT_PATH/custom_release_notes.txt" ]; then
           custom_release_notes_length=$(cat "$OPENWRT_PATH/custom_release_notes.txt" | wc -c)
           if [ $custom_release_notes_length -gt 100 ]; then
