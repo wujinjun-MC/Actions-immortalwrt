@@ -42,7 +42,7 @@ grep "linkease/nas-packages-luci.git" feeds.conf.default || sed -i '$a src-git n
 # { 导入补丁和配置 & 执行脚本 }
 cd "$GITHUB_WORKSPACE"
 [ -d files ] && cp -r files "$OPENWRT_PATH/files" || echo "files not found"
-rm -rf "$OPENWRT_PATH/.config"
+rm -f "$OPENWRT_PATH/.config"
     # [ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> "$OPENWRT_PATH/.config"
     # [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"
     # [ -f $CONFIG_5G ] && cat $CONFIG_5G >> "$OPENWRT_PATH/.config"
