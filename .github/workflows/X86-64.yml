@@ -265,7 +265,7 @@ jobs:
       uses: actions/cache/restore@v5
       with:
         key: x86-${{env.REPO_BRANCH}}-${{env.WRT_HASH}}
-        restore-keys: x86-${{env.REPO_BRANCH}}
+        #restore-keys: x86-${{env.REPO_BRANCH}}
         path: |
           ./openwrt/.ccache
           ./openwrt/staging_dir/host*
@@ -410,14 +410,14 @@ jobs:
     - name: Backup Cpolar Log to Artifact (备份 Cpolar log 到Artifact)
       uses: actions/upload-artifact@main
       with:
-        name: cpolar-log
+        name: cpolar-log.zip
         include-hidden-files: true
         path: /tmp/cpolar.log
 
     - name: Backup Config to Artifact (备份配置到Artifact)
       uses: actions/upload-artifact@main
       with:
-        name: config-debug-${{ env.FIRMWARE_TAG }}
+        name: config-debug-${{ env.FIRMWARE_TAG }}.zip
         include-hidden-files: true
         path: ${{ env.OPENWRT_PATH }}/.config
 
@@ -425,7 +425,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@main
       with:
-        name: custom_release_notes-${{ env.FIRMWARE_TAG }}
+        name: custom_release_notes-${{ env.FIRMWARE_TAG }}.zip
         include-hidden-files: true
         path: |
           ${{ env.OPENWRT_PATH }}/custom_release_notes.txt
@@ -514,7 +514,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@main
       with:
-        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-1
+        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-1.zip
         include-hidden-files: true
         path: |
           ${{ env.OPENWRT_PATH }}/build-log-color.log
@@ -606,7 +606,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@main
       with:
-        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-2
+        name: compile-log-and-custom_release_notes-${{ env.FIRMWARE_TAG }}-2.zip
         include-hidden-files: true
         path: |
           ${{ env.OPENWRT_PATH }}/build-log-color.log
@@ -618,7 +618,7 @@ jobs:
       uses: actions/upload-artifact@main
       if: (!cancelled()) && env.CAN_UPLOAD == 'true' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}.zip
         path: openwrt/bin
 
     - name: 整理文件
@@ -644,6 +644,7 @@ jobs:
           fi
         fi
 
+        cp "$OPENWRT_PATH/custom_release_notes.txt" ./
         tar -zcf Packages.tar.gz packages
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
