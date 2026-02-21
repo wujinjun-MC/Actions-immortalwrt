@@ -46,7 +46,7 @@ CLASH_META_URL=$(curl -sL https://api.github.com/repos/MetaCubeX/Clash.Meta/rele
 
 # wget -qO- $CLASH_DEV_URL | gunzip -c > files/etc/openclash/core/clash
 # wget -qO- $CLASH_TUN_URL | gunzip -c > files/etc/openclash/core/clash_tun
-wget -qO- $CLASH_META_URL | gunzip -c > files/etc/openclash/core/clash_meta
+wget -O- $CLASH_META_URL | gunzip -c > files/etc/openclash/core/clash_meta
 
 # 给内核权限
 chmod +x files/etc/openclash/core/clash*
@@ -60,8 +60,8 @@ GEOSITE_URL=https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest
 # Country.mmdb
 COUNTRY_FULL_URL=https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb
 
-wget -qO- $GEOIP_URL > files/etc/openclash/GeoIP.dat
-wget -qO- $GEOSITE_URL > files/etc/openclash/GeoSite.dat
-wget -qO- $COUNTRY_FULL_URL > files/etc/openclash/Country.mmdb
+wget -O- $GEOIP_URL > files/etc/openclash/GeoIP.dat
+wget -O- $GEOSITE_URL > files/etc/openclash/GeoSite.dat
+wget -O- $COUNTRY_FULL_URL > files/etc/openclash/Country.mmdb
 
 echo "preset-clash-core executed successfully!"
