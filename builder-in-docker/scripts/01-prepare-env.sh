@@ -30,13 +30,14 @@ echo "export OPENWRT_PATH=$(pwd)" >> "$SHARED_ENV"
 # { 安装 feeds }
 cd "$OPENWRT_PATH"
 
-    # 添加 small-package https://github.com/kenzok8/small-package
-echo >> feeds.conf.default
-grep "kenzok8/small-package" feeds.conf.default || sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
-
+    # 更换顺序， jell 现在在 small-package 之前，优先级更高，没有测试
     # 添加 jell https://github.com/kenzok8/jell
 echo >> feeds.conf.default
 grep "kenzok8/jell" feeds.conf.default || sed -i '$a src-git jell https://github.com/kenzok8/jell' feeds.conf.default
+
+    # 添加 small-package https://github.com/kenzok8/small-package
+echo >> feeds.conf.default
+grep "kenzok8/small-package" feeds.conf.default || sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
 
     # 添加 istoreos 界面 https://github.com/linkease/nas-packages-luci
 echo >> feeds.conf.default

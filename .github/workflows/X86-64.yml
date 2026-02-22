@@ -13,7 +13,7 @@ name: X86-64
 permissions: write-all
 #开启写权限，防止无法上传到release
 
-run-name: "x86-64 ${{ inputs.debug_or_make_config }} ${{ inputs.cpolar_token_type }} wujinjun|others|larger:${{ inputs.use_wujinjun }}|${{ inputs.use_others }}|${{ inputs.use_larger }} single_thread:${{ inputs.force_single_thread }} ccache:${{ inputs.use_ccache }}"
+run-name: "x86-64 ${{ inputs.debug_or_make_config }} ${{ inputs.cpolar_token_type }} wujinjun|others|larger:${{ inputs.use_wujinjun }}|${{ inputs.use_others }}|${{ inputs.use_larger }} single_thread:${{ inputs.force_single_thread }} ccache:${{ inputs.use_ccache }}" sccache:${{ inputs.use_sccache }}"
 
 on:
   # repository_dispatch:
@@ -57,6 +57,10 @@ on:
         type: boolean
       use_ccache:
         description: "使用 ccache 加速编译"
+        default: true
+        type: boolean
+      use_sccache:
+        description: "使用 sccache (Rust ccache) 加速编译"
         default: true
         type: boolean
       use_wujinjun:
@@ -127,6 +131,11 @@ env:
       github.event_name == 'workflow_dispatch', inputs.use_ccache,
       'true'
     ) }}
+  USE_SCCACHE: |-
+    ${{ case(
+      github.event_name == 'workflow_dispatch', inputs.use_sccache,
+      'true'
+    ) }}
   USE_WUJINJUN: |-
     ${{ case(
       github.event_name == 'workflow_dispatch', inputs.use_wujinjun,
@@ -180,7 +189,7 @@ jobs:
         sudo -E apt-get -qq update -y
         sudo -E apt-get -qq full-upgrade -y
         sudo bash -c 'bash <(curl -sL https://build-scripts.immortalwrt.org/init_build_environment.sh)'
-        sudo -E apt -yqq install dos2unix libfuse-dev ccache mkisofs ncdu btop colorized-logs expect safe-rm 
+        sudo -E apt -yqq install dos2unix libfuse-dev ccache sccache mkisofs ncdu btop colorized-logs expect safe-rm 
         chmod +x $ENV_SH && $ENV_SH
         sudo rm -rf /var/lib/apt/lists/*
         sudo -E apt -yqq autoremove --purge
@@ -284,6 +293,7 @@ jobs:
         #restore-keys: x86-${{env.REPO_BRANCH}}
         path: |
           ./openwrt/.ccache
+          ./openwrt/.sccache
           ./openwrt/staging_dir/host*
           ./openwrt/staging_dir/tool*
 
@@ -305,13 +315,14 @@ jobs:
       run: |
         cd $OPENWRT_PATH
 
-        # 添加 small-package https://github.com/kenzok8/small-package
-        echo >> feeds.conf.default
-        sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
-
+        # 更换顺序， jell 现在在 small-package 之前，优先级更高，没有测试
         # 添加 jell https://github.com/kenzok8/jell
         echo >> feeds.conf.default
         sed -i '$a src-git jell https://github.com/kenzok8/jell' feeds.conf.default
+
+        # 添加 small-package https://github.com/kenzok8/small-package
+        echo >> feeds.conf.default
+        sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
 
         # 添加 istoreos 界面 https://github.com/linkease/nas-packages-luci
         echo >> feeds.conf.default
@@ -698,7 +709,7 @@ jobs:
         echo "- 🔗 源码版本: [${{ env.SHORT_COMMIT_BUILDER }}](${{ env.REPO_URL_BUILDER }}/commit/${{ env.COMMIT_HASH_BUILDER }})" >> release.txt
         echo "- 🚀 本次运行 Workflow: [#${{ github.run_number }} (${{ github.run_id }})](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> release.txt
         echo "- 🛠️ Workflow 定义文件: [${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/X86-64.yml)" >> release.txt
-        echo "- ⚙️ Workflow 变量 / 动态名称: x86-64 ${{ env.CPOLAR }} ${{ env.CPOLAR_TOKEN_TYPE }} wujinjun|others|larger:${{ env.USE_WUJINJUN }}|${{ env.USE_OTHERS }}|${{ env.USE_LARGER }} single_thread:${{ env.FORCE_SINGLE_THREAD }} ccache:${{ env.USE_CCACHE }}"
+        echo "- ⚙️ Workflow 变量 / 动态名称: x86-64 ${{ env.CPOLAR }} ${{ env.CPOLAR_TOKEN_TYPE }} wujinjun|others|larger:${{ env.USE_WUJINJUN }}|${{ env.USE_OTHERS }}|${{ env.USE_LARGER }} single_thread:${{ env.FORCE_SINGLE_THREAD }} ccache:${{ env.USE_CCACHE }}" sccache:${{ env.USE_SCCACHE }}"
         echo "### 📒 固件信息(WIFI)" >> release.txt
         echo "- x86_64的固件" >> release.txt
         echo "- 💻 这是 (x86_64) 平台使用的 OpenWrt 固件" >> release.txt
@@ -770,6 +781,7 @@ jobs:
         key: x86-${{env.REPO_BRANCH}}-${{env.WRT_HASH}}
         path: |
           ./openwrt/.ccache
+          ./openwrt/.sccache
           ./openwrt/staging_dir/host*
           ./openwrt/staging_dir/tool*
 

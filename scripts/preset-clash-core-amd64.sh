@@ -65,3 +65,5 @@ wget -O- $GEOSITE_URL > files/etc/openclash/GeoSite.dat
 wget -O- $COUNTRY_FULL_URL > files/etc/openclash/Country.mmdb
 
 echo "preset-clash-core executed successfully!"
+echo "请确认文件大小是否正确"
+du -sh files/etc/openclash/core/clash* files/etc/openclash/GeoIP.dat files/etc/openclash/GeoSite.dat files/etc/openclash/Country.mmdb 

@@ -1,0 +1,16 @@
+#!/bin/sh
+# Disable and stop services at first boot.
+
+# Example
+    # Disable service（or remove symlink in /etc/rc.d）
+#/etc/init.d/example disable
+    # Stop the service
+#/etc/init.d/example stop
+
+# Nodogsplash
+if [ -e /etc/init.d/nodogsplash ]; then
+    /etc/init.d/nodogsplash disable
+    /etc/init.d/nodogsplash stop
+fi
+
+exit 0
