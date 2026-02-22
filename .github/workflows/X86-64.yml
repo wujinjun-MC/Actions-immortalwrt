@@ -47,6 +47,10 @@ on:
           - TOKEN_1
           - TOKEN_2
           - TOKEN_3
+      make_thread:
+        description: '线程数 设置为0表示 CPU核心数*2+1'
+        required: true
+        default: '0'
       force_single_thread:
         description: "强制单线程编译"
         default: false
@@ -116,6 +120,7 @@ env:
   CPOLAR: ${{ inputs.debug_or_make_config || 'none' }}
   MENUCONFIG_COLOR: ${{ inputs.menuconfig_color || 'bluetitle' }}
   CPOLAR_TOKEN_TYPE: ${{ inputs.cpolar_token_type || 'TOKEN_1' }}
+  MAKE_THREAD: ${{ inputs.make_thread || '0' }}
   FORCE_SINGLE_THREAD: ${{ inputs.force_single_thread || 'false' }}
   USE_CCACHE: |-
     ${{ case(
@@ -251,6 +256,11 @@ jobs:
 
     - name: Generate Variables(生成变量)
       run: |
+        # 确定线程数
+        if [ $MAKE_THREAD = 0 ]; then
+          echo "MAKE_THREAD=$(( $(nproc) * 2 + 1 ))" >> $GITHUB_ENV
+        fi
+
         cp $PLATFORM_FILE $OPENWRT_PATH/.config
         cd $OPENWRT_PATH
         make defconfig > /dev/null 2>&1
@@ -469,7 +479,7 @@ jobs:
         echo >> "$OPENWRT_PATH/build-log-color.log"
 
         # 第一次尝试：多线程编译
-        unbuffer make -j$(( $(nproc) + 1 )) V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
+        unbuffer make -j"$MAKE_THREAD" V=s 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1
 
         echo >> "$OPENWRT_PATH/build-log-color.log"
         echo "-------- Stop building - $(date +"%Y-%m-%d %H:%M:%S") --------" >> "$OPENWRT_PATH/build-log-color.log"

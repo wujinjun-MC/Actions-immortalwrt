@@ -8,6 +8,13 @@ export SHARED_ENV=$(realpath ./.env)
 export FIX_VERSION_INVALID=true
 echo "export FIX_VERSION_INVALID=true" >> "$SHARED_ENV"
 
+# 确定线程数: CPU数量 * 2 + 1，最大8，过大容易下载错误
+export MAKE_THREAD=$(( $(nproc) * 2 + 1 ))
+if [ $MAKE_THREAD -gt 8 ]; then
+    export MAKE_THREAD=8
+fi
+echo "export MAKE_THREAD=$MAKE_THREAD" >> "$SHARED_ENV"
+
 # { Checkout, 克隆源码 }
 [[ -v REPO_URL_BUILDER ]] || export REPO_URL_BUILDER="https://github.com/wujinjun-MC/Actions-immortalwrt"
 if [ ! -e openwrt ]; then
