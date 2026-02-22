@@ -60,7 +60,8 @@ CONFIG_PACKAGE_luci-app-passwall2=y
 CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_Hysteria=y
 CONFIG_PACKAGE_luci-app-pbr=y
 CONFIG_PACKAGE_luci-app-public-ip-monitor=y
-CONFIG_PACKAGE_luci-app-pve=y
+# 你会在 Openwrt 里面安装 PVE ? 不是在 PVE 里面安装 Openwrt ?
+#CONFIG_PACKAGE_luci-app-pve=y
 CONFIG_PACKAGE_luci-app-qbittorrent=y
 CONFIG_PACKAGE_luci-app-qosmate=y
 CONFIG_PACKAGE_luci-app-quickstart=y
