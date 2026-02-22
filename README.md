@@ -42,17 +42,6 @@
 
 - x86: 
     1. `ERROR: info field 'version' has invalid value: package version is invalid` (可能因为OpenWRT官方从OPKG换成apk,部分软件包未适配，请耐心等待) (如果急需这些软件包，需要在新增actions run时开启 `fix_version_invalid` / 本地Docker编译时设置 `FIX_VERSION_INVALID=true` 。将会使用overwrite遍历修复版本号(可能会导致其他正常软件包的版本号被修改))
-      1. vmease (依赖 by [hidden(see wujinjun-MC/openwrt-ci)], luci-app-vmease):
-        - 即使使用版本号自动修复也失败
-        - 当前日志:
-          ```
-          ERROR: info field 'version' has invalid value: package version is invalid
-          ERROR: failed to create package: package version is invalid
-          make[3]: *** [Makefile:96: /home/wujinjun/build/Actions-immortalwrt/openwrt/bin/packages/x86_64/smpackage/vmease-0.8.7-rx86_64-1.apk] Error 99
-          make[3]: Leaving directory '/home/wujinjun/build/Actions-immortalwrt/openwrt/feeds/smpackage/vmease'
-          time: package/feeds/smpackage/vmease/compile#0.31#0.27#0.62
-              ERROR: package/feeds/smpackage/vmease failed to build.
-          ```
     2. 内核不兼容
     3. 源码有bug
       1. ~~`libubox` (依赖 by (自己看，太多了))~~:
