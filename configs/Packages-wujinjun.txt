@@ -60,7 +60,8 @@ CONFIG_PACKAGE_luci-app-passwall2=y
 CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_Hysteria=y
 CONFIG_PACKAGE_luci-app-pbr=y
 CONFIG_PACKAGE_luci-app-public-ip-monitor=y
-CONFIG_PACKAGE_luci-app-pve=y
+# 艹: 依赖的 `vmease` 一直 `package version is invalid` 即使 `patch/01-fix-version-invalid.py`-ed
+#CONFIG_PACKAGE_luci-app-pve=y
 CONFIG_PACKAGE_luci-app-qbittorrent=y
 CONFIG_PACKAGE_luci-app-qosmate=y
 CONFIG_PACKAGE_luci-app-quickstart=y
