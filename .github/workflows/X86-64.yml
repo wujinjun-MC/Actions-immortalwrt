@@ -397,9 +397,15 @@ jobs:
         # 如果设置使用ccache,自动打开
         if [ "$USE_CCACHE"x = "true"x ]; then
           echo "检测到 "'$USE_CCACHE'" = true，正在修改配置以开启ccache"
-          sed -i 's/# CONFIG_CCACHE is not set/CONFIG_CCACHE=y/' .config
-          sed -i 's/CONFIG_CCACHE=n/CONFIG_CCACHE=y/' .config
+          #sed -i 's/# CONFIG_CCACHE is not set/CONFIG_CCACHE=y/' .config || sed -i 's/CONFIG_CCACHE=n/CONFIG_CCACHE=y/' .config
           grep -q "CONFIG_CCACHE=y" .config || echo "CONFIG_CCACHE=y" >> .config
+        fi
+
+        # 如果设置使用sccache,自动打开
+        if [ "$USE_SCCACHE"x = "true"x ]; then
+          echo "检测到 "'$USE_SCCACHE'" = true，正在修改配置以开启ccache"
+          #sed -i 's/# CONFIG_SCCACHE is not set/CONFIG_SCCACHE=y/' .config || sed -i 's/CONFIG_SCCACHE=n/CONFIG_SCCACHE=y/' .config
+          grep -q "CONFIG_SCCACHE=y" .config || echo "CONFIG_SCCACHE=y" >> .config
         fi
 
         # 检查和构建ccache
