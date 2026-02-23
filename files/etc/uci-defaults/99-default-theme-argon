@@ -1,0 +1,6 @@
+#!/bin/bash
+# Change default theme to `argon`
+if grep "option Argon" /etc/config/luci >/dev/null 2>&1; then
+    uci set luci.main.mediaurlbase='/luci-static/argon' &&
+        uci commit
+fi
