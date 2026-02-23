@@ -1,15 +1,15 @@
 --- feeds/packages/net/qBittorrent-Enhanced-Edition/Makefile.bak        2026-02-22 15:01:33.594079298 +0800
 +++ feeds/packages/net/qBittorrent-Enhanced-Edition/Makefile    2026-02-22 15:02:24.539880559 +0800
 @@ -48,7 +48,8 @@
-	-DQT6=ON \
-	-DSTACKTRACE=OFF \
-	-DWEBUI=ON \
+ 	-DQT6=ON \
+ 	-DSTACKTRACE=OFF \
+ 	-DWEBUI=ON \
 -	-DQT_ADDITIONAL_PACKAGES_PREFIX_PATH=$(STAGING_DIR_HOSTPKG)
 +	-DQT_ADDITIONAL_PACKAGES_PREFIX_PATH=$(STAGING_DIR_HOSTPKG) \
 +	-DCMAKE_CXX_FLAGS="-Wno-pedantic"
-
+ 
  define Package/qbittorrent-enhanced-edition/install
-	$(INSTALL_DIR) $(1)/usr/bin
+ 	$(INSTALL_DIR) $(1)/usr/bin
 
 # This should fix "failed to build" error.
 # ```
