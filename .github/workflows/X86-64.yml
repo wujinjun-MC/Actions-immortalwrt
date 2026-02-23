@@ -13,7 +13,7 @@ name: X86-64
 permissions: write-all
 #开启写权限，防止无法上传到release
 
-run-name: "x86-64 ${{ inputs.debug_or_make_config }} ${{ inputs.cpolar_token_type }} wujinjun|others|larger:${{ inputs.use_wujinjun }}|${{ inputs.use_others }}|${{ inputs.use_larger }} single_thread:${{ inputs.force_single_thread }} ccache:${{ inputs.use_ccache }}" sccache:${{ inputs.use_sccache }}"
+run-name: "x86-64 ${{ inputs.debug_or_make_config }} ${{ inputs.cpolar_token_type }} wujinjun|others|larger:${{ inputs.use_wujinjun }}|${{ inputs.use_others }}|${{ inputs.use_larger }} single_thread:${{ inputs.force_single_thread }} ccache:${{ inputs.use_ccache }} sccache:${{ inputs.use_sccache }}"
 
 on:
   # repository_dispatch:
