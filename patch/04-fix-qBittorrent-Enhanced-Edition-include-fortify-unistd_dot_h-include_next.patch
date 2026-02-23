@@ -8,7 +8,7 @@
 +	-DQT_ADDITIONAL_PACKAGES_PREFIX_PATH=$(STAGING_DIR_HOSTPKG) \
 +	-DCMAKE_CXX_FLAGS="-Wno-pedantic"
 
-define Package/qbittorrent-enhanced-edition/install
+ define Package/qbittorrent-enhanced-edition/install
 	$(INSTALL_DIR) $(1)/usr/bin
 
 # This should fix "failed to build" error.
