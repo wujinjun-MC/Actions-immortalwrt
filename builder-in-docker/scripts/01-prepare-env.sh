@@ -62,9 +62,12 @@ rm -f "$OPENWRT_PATH/.config"
     # if [ "$USE_LARGER"x = "true"x ]; then
     #     [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"
     # fi
+    # if [ "$USE_BUSYBOX"x = "true"x ]; then
+    #     [ -f $CONFIG_WUJINJUN_BUSYBOX ] && cat $CONFIG_WUJINJUN_BUSYBOX >> "$OPENWRT_PATH/.config"
+    # fi
 #export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt
 #echo "export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt" >> "$SHARED_ENV"
-[ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"
+[ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_BUSYBOX ] && cat $CONFIG_WUJINJUN_BUSYBOX >> "$OPENWRT_PATH/.config"
 
 echo "默认开启 ccache 和 sccache (Rust ccache)"
 grep -q "CONFIG_CCACHE=y" .config || echo "CONFIG_CCACHE=y" >> .config

@@ -18,10 +18,10 @@
    4. [small-package](https://github.com/kenzok8/small-package): 更多软件包
 4. 自定义overwrite
    1. [01-nginx-disable-https](./overwrite/01-nginx-disable-https) nginx默认使用http
-   2. 
+   2. ... (see overwrite/)
 5. 自定义patch
    1. [01-fix-version-invalid](./patch/01-fix-version-invalid.py*) 修复旧软件包 `ERROR: info field 'version' has invalid value: package version is invalid` 问题
-   2. 
+   2. ... (see patch/)
 6. release信息:
    1. 显示编译时所使用的commit (包括源码和本仓库的)
    2. 自定义发布信息 (Release notes): 需要远程连接后，在源码目录创建 `custom_release_notes.txt`
@@ -30,7 +30,8 @@
    2. 修复UPnP - 默认打开libupnp
    3. 关闭 `luci-app-oaf` 避免编译 KMOD_oaf (有bug无法编译) (依赖 by appfilter)
    4. 自动编译缺失的 `ccache` 工具链 (即使已经安装 `ccache` 也不行，必须使用官方源码编译到指定目录)
-8. (Todo) 根据actions过程创建Dockerfile和所需的一键脚本，方便本地编译
+8. 根据actions过程创建Dockerfile和所需的一键脚本，方便本地编译
+9. ... (see commits)
 
 ### 已测试通过 更多查看 `openwrt-ci`
 

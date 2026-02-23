@@ -30,6 +30,7 @@ ENV CONFIG_FILE=configs/Packages.txt
 ENV CONFIG_5G=configs/Packages-5G.txt
 ENV CONFIG_WUJINJUN=configs/Packages-wujinjun.txt
 ENV CONFIG_WUJINJUN_LARGER=configs/Packages-wujinjun-larger.txt
+ENV CONFIG_WUJINJUN_BUSYBOX=configs/Packages-wujinjun-busybox.txt
 ENV CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt
 ENV SETTINGS_SH=scripts/init-settings.sh
 ENV PACKAGES_SH=scripts/packages.sh
