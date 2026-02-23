@@ -437,9 +437,9 @@ jobs:
               echo "ENABLED_CCACHE=true" >> $GITHUB_ENV
             else
               echo "系统未安装ccache，开始构建"
-              if make tools/ccache/compile -j$(nproc); then
+              if make tools/ccache/compile -j$MAKE_THREAD; then
                 echo "ccache 构建成功，本次编译将支持ccache"
-                #make tools/install
+                #make tools/install -j$MAKE_THREAD
                 mkdir -p "$OPENWRT_PATH/.ccache"
                 echo "ENABLED_CCACHE=true" >> $GITHUB_ENV
               else
@@ -493,7 +493,7 @@ jobs:
       run: |
         set -o pipefail
         cd $OPENWRT_PATH
-        echo -e "$(( $(nproc) + 1 )) thread compile"
+        echo -e "$MAKE_THREAD thread compile"
         # 记录开始编译时的时间戳
         printf "TIMESTAMP_START_COMPILE=%(%s)T" >> $GITHUB_ENV
         echo >> $GITHUB_ENV

@@ -40,9 +40,9 @@ if grep "CONFIG_CCACHE=y" .config; then
             echo "export ENABLED_CCACHE=true" >> "$SHARED_ENV"
         else
             echo "系统未安装ccache，开始构建"
-            if make tools/ccache/compile -j$(nproc); then
+            if make tools/ccache/compile -j$MAKE_THREAD; then
                 echo "ccache 构建成功，本次编译将支持ccache"
-                make tools/install
+                #make tools/install -j$MAKE_THREAD
                 mkdir -p "$OPENWRT_PATH/.ccache"
                 export ENABLED_CCACHE=true
                 echo "export ENABLED_CCACHE=true" >> "$SHARED_ENV"
