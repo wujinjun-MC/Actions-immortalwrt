@@ -204,6 +204,8 @@
       2. 备份好原始全量 `.config`
       3. 开始勾选软件包，可以 `Save` 然后对比文件变化。记得记录打开/关闭了什么
       4. 之后需要关闭软件包时，建议恢复原始 `.config` ，然后重新打开其他软件包
+2. 启用 `intel-microcode` 后必须要 `make clean` 否则 `intel-microcode` 无法编译?
+  - `make package/firmware/intel-microcode/clean`
 
 ### Q&A
 
