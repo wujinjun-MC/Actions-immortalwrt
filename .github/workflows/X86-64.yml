@@ -300,6 +300,7 @@ jobs:
         path: |
           ./openwrt/.ccache
           ./openwrt/.sccache
+          ./openwrt/dl
           ./openwrt/staging_dir/host*
           ./openwrt/staging_dir/tool*
 

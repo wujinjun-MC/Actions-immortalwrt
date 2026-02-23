@@ -21,6 +21,6 @@ echo ">> patch target/linux/x86/image/Makefile $GITHUB_WORKSPACE/patch/03-fix-BI
 patch target/linux/x86/image/Makefile "$GITHUB_WORKSPACE/patch/03-fix-BIOS-Boot-Partition-is-under-1MiB.patch"
 
 # 4. patch-04-fix-qBittorrent-Enhanced-Edition-include-fortify-unistd_dot_h-include_next 修复 qBittorrent-Enhanced-Edition 调用 fortify 的 unistd.d 时因为 “#include_next" 而失败
-echo "Applying patch-04-fix-qBittorrent-Enhanced-Edition-include-fortify-unistd_dot_h-include_next ( 修复 qBittorrent-Enhanced-Edition 调用 fortify 的 unistd.d 时因为 “#include_next" 而失败 )"
+echo "Applying patch-04-fix-qBittorrent-Enhanced-Edition-include-fortify-unistd_dot_h-include_next ( 修复 qBittorrent-Enhanced-Edition 调用 fortify 的 unistd.d 时因为 \"#include_next\" 而失败 )"
 echo ">> patch target/linux/x86/image/Makefile $GITHUB_WORKSPACE/patch/04-fix-qBittorrent-Enhanced-Edition-include-fortify-unistd_dot_h-include_next.patch"
 patch feeds/packages/net/qBittorrent-Enhanced-Edition/Makefile "$GITHUB_WORKSPACE/patch/04-fix-qBittorrent-Enhanced-Edition-include-fortify-unistd_dot_h-include_next.patch"
