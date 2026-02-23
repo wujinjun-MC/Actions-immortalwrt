@@ -62,9 +62,14 @@ rm -f "$OPENWRT_PATH/.config"
     # if [ "$USE_LARGER"x = "true"x ]; then
     #     [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"
     # fi
-export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt
-echo "export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt" >> "$SHARED_ENV"
+#export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt
+#echo "export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt" >> "$SHARED_ENV"
 [ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"
+
+echo "默认开启 ccache 和 sccache (Rust ccache)"
+grep -q "CONFIG_CCACHE=y" .config || echo "CONFIG_CCACHE=y" >> .config
+grep -q "CONFIG_RUST_SCCACHE=y" .config || echo "CONFIG_RUST_SCCACHE=y" >> .config
+
 chmod +x $RUST_SH && $RUST_SH
 cd "$OPENWRT_PATH"
 echo "执行 $GITHUB_WORKSPACE/$SETTINGS_SH"
@@ -77,6 +82,9 @@ echo "执行 $GITHUB_WORKSPACE/$CLASH_CORE_SH"
 chmod +x $GITHUB_WORKSPACE/$CLASH_CORE_SH && $GITHUB_WORKSPACE/$CLASH_CORE_SH
 echo "执行 $GITHUB_WORKSPACE/$CUSTOM_SH"
 chmod +x $GITHUB_WORKSPACE/$CUSTOM_SH && $GITHUB_WORKSPACE/$CUSTOM_SH
+
+echo ".config 创建硬链接到 $OPENWRT_PATH/files/etc/build.config ，在 openwrt 打开 /etc/build.config 即可查看编译时使用的配置"
+ln "$OPENWRT_PATH/.config" "$OPENWRT_PATH/files/etc/build.config"
 
 chmod +x $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh && $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh
 chmod +x $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh && $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh

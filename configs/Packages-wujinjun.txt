@@ -61,6 +61,7 @@ CONFIG_PACKAGE_luci-app-natter2=y
 # 无法使用 (openwrt-ci 已提及)
 #CONFIG_PACKAGE_luci-app-nginx-manager=y
 CONFIG_PACKAGE_luci-app-nginx=y
+CONFIG_PACKAGE_luci-app-oaf=y
 CONFIG_PACKAGE_luci-app-onliner=y
 CONFIG_PACKAGE_luci-app-openclash=y
 CONFIG_PACKAGE_luci-app-packet-capture=y
