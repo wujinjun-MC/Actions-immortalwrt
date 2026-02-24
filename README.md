@@ -45,7 +45,7 @@
     1. `ERROR: info field 'version' has invalid value: package version is invalid` (可能因为OpenWRT官方从OPKG换成apk,部分软件包未适配，请耐心等待) (如果急需这些软件包，需要在新增actions run时开启 `fix_version_invalid` / 本地Docker编译时设置 `FIX_VERSION_INVALID=true` 。将会使用overwrite遍历修复版本号(可能会导致其他正常软件包的版本号被修改))
     2. 内核不兼容
     3. 源码有bug
-      1. ~~`libubox` (依赖 by (自己看，太多了))~~:
+      1. ~~`libubox` (依赖 by (自己看，太多了))~~ 删除 `staging_dir` 后， patch 会重新生效，修复这个 bug:
         ```
         FAILED: [code=1] CMakeFiles/ubox.dir/avl-cmp.c.o 
         /workdir/openwrt/staging_dir/host/bin/ccache /workdir/openwrt/staging_dir/toolchain-x86_64_gcc-14.3.0_musl/bin/x86_64-openwrt-linux-musl-gcc -Dubox_EXPORTS -I/workdir/openwrt/staging_dir/target-x86_64_musl/usr/include/json-c -Os -pipe -fno-caller-saves -fno-plt -fhonour-copts -fmacro-prefix-map=/workdir/openwrt/build_dir/target-x86_64_musl/libubox-2026.02.13~1aa36ee7=libubox-2026.02.13~1aa36ee7 -Wformat -Werror=format-security -fstack-protector -D_FORTIFY_SOURCE=1 -Wl,-z,now -Wl,-z,relro -Wl,-z,pack-relative-relocs -I/workdir/openwrt/staging_dir/target-x86_64_musl/usr/include  -I/workdir/openwrt/staging_dir/toolchain-x86_64_gcc-14.3.0_musl/usr/include -I/workdir/openwrt/staging_dir/toolchain-x86_64_gcc-14.3.0_musl/include -I/workdir/openwrt/staging_dir/toolchain-x86_64_gcc-14.3.0_musl/include/fortify -DNDEBUG -fPIC   -Wall -Werror -Wextra -Werror=implicit-function-declaration -Wformat -Werror=format-security -Werror=format-nonliteral -Os -std=gnu99 -g3 -Wmissing-declarations -Wno-unused-parameter -MD -MT CMakeFiles/ubox.dir/avl-cmp.c.o -MF CMakeFiles/ubox.dir/avl-cmp.c.o.d -o CMakeFiles/ubox.dir/avl-cmp.c.o -c '/workdir/openwrt/build_dir/target-x86_64_musl/libubox-2026.02.13~1aa36ee7/avl-cmp.c'
@@ -70,6 +70,16 @@
             ERROR: package/libs/libubox failed to build.
         make[2]: *** [package/Makefile:188: package/libs/libubox/compile] Error 1
         ```
+      2. `libvirt`: 一直提示缺失 `libssh.so.4` 即使 libssh 已启用
+        ```
+        Package libvirt is missing dependencies for the following libraries:
+        libssh.so.4
+        make[2]: *** [Makefile:129: /home/wujinjun/build/Actions-immortalwrt/openwrt/bin/packages/x86_64/jell/libvirt-11.10.0-r4.apk] Error 1
+        make[2]: Leaving directory '/home/wujinjun/build/Actions-immortalwrt/openwrt/feeds/jell/libvirt'
+        time: package/feeds/jell/libvirt/compile#403.35#41.06#52.20
+            ERROR: package/feeds/jell/libvirt failed to build.
+        make[1]: *** [package/Makefile:188: package/feeds/jell/libvirt/compile] Error 1
+        ```
     4. 冲突
       1. `luci-app-eqos` and `eqos-3` (无中生包? config 里面根本没有):
         ```
@@ -87,6 +97,7 @@
         ```
       3. `luci-app-mosdns` and `mosdns` (依赖 by luci-app-mosdns): `ERROR: luci-app-mosdns-1.6.17-r1: trying to overwrite etc/init.d/mosdns owned by mosdns-5.3.3-r1.`
         - 艹: (configs/Packages.txt)[configs/Packages.txt] 你怎么通过的，作弊?
+      4. `luci-app-pppoe-relay` and `rp-pppoe-relay`, `luci-app-pppoe-server` and `rp-pppoe-server`
     5. 看起来编译成功，实际刷入后用不了 (参见 [已测试通过](#已测试通过) 的测试状态)
     6. 迷惑行为
     7. 缺失依赖

@@ -28,6 +28,7 @@ CONFIG_PACKAGE_luci-nginx=y
 CONFIG_PACKAGE_luci-proto-wireguard=y
 CONFIG_PACKAGE_luci-lib-ipkg=y
 CONFIG_PACKAGE_luci-lib-json=y
+CONFIG_PACKAGE_luci-proto-external=y
 
 CONFIG_PACKAGE_luci-app-advancedplus=y
 CONFIG_PACKAGE_luci-app-autoipsetadder=y
@@ -71,6 +72,13 @@ CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Trojan_Plus=n
 CONFIG_PACKAGE_luci-app-passwall2=y
 CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_Hysteria=y
 CONFIG_PACKAGE_luci-app-pbr=y
+CONFIG_PACKAGE_luci-app-poweroff=y
+CONFIG_PACKAGE_luci-app-poweroffdevice=y
+# 冲突 with `rp-pppoe-relay`, select `rp-pppoe-relay`
+#CONFIG_PACKAGE_luci-app-pppoe-relay=y
+# 冲突 with `rp-pppoe-server`, select `rp-pppoe-server`
+#CONFIG_PACKAGE_luci-app-pppoe-server=y
+CONFIG_PACKAGE_luci-app-pppoe-user=y
 CONFIG_PACKAGE_luci-app-public-ip-monitor=y
 # 你会在 Openwrt 里面安装 PVE ? 不是在 PVE 里面安装 Openwrt ?
 #CONFIG_PACKAGE_luci-app-pve=y
@@ -82,7 +90,9 @@ CONFIG_PACKAGE_luci-app-quickstart=y
 CONFIG_LUCI_JSMIN=n
 CONFIG_LUCI_CSSTIDY=n
 
+CONFIG_PACKAGE_luci-app-rp-pppoe-server=y
 CONFIG_PACKAGE_luci-app-rtbwmon=y
+CONFIG_PACKAGE_luci-app-shutdown=y
 CONFIG_PACKAGE_luci-app-socat=y
 CONFIG_PACKAGE_luci-app-sqm=y
 CONFIG_PACKAGE_luci-app-statistics=y
@@ -121,29 +131,28 @@ CONFIG_PACKAGE_bridger=y
 ### Enable "Customize busybox options"
 CONFIG_BUSYBOX_CUSTOM=y
 
-### Settings
-#### Provide compatible behavior for rare corner cases (bigger code)
-CONFIG_BUSYBOX_CONFIG_EXTRA_COMPAT=y
-#### Support utmp/wtmp file (track who login/logout)
-CONFIG_BUSYBOX_CONFIG_FEATURE_UTMP=y
-CONFIG_BUSYBOX_CONFIG_FEATURE_WTMP=y
-#### Include busybox applet, Support "--show SCRIPT" and "--install [-s] to install applet links at runtime"
-CONFIG_BUSYBOX_CONFIG_BUSYBOX=y
-CONFIG_BUSYBOX_CONFIG_FEATURE_SHOW_SCRIPT=y
-CONFIG_BUSYBOX_CONFIG_FEATURE_INSTALLER=y
-#### Drop SUID state for most applets, Enable SUID configuration via /etc/busybox.conf
-CONFIG_BUSYBOX_CONFIG_FEATURE_SUID=y
-CONFIG_BUSYBOX_CONFIG_FEATURE_SUID_CONFIG=y
-#### Support LOG_INFO level syslog messages
-CONFIG_BUSYBOX_CONFIG_FEATURE_SYSLOG_INFO=y
-#### Reverse history search
-CONFIG_BUSYBOX_CONFIG_FEATURE_REVERSE_SEARCH=y
-#### Query cursor position from terminal
-CONFIG_BUSYBOX_CONFIG_FEATURE_EDITING_ASK_TERMINAL=y
-#### Enable automatic tracking of window size changes
-CONFIG_BUSYBOX_CONFIG_FEATURE_EDITING_WINCH=y
-
-### More busybox tweaks: enable Packages-wujinjun-busybox.txt
+### Settings, see Packages-wujinjun-busybox.txt
+# #### Provide compatible behavior for rare corner cases (bigger code)
+# ##### 艹: 会引起 findutils/grep 大量错误
+# #CONFIG_BUSYBOX_CONFIG_EXTRA_COMPAT=y
+# #### Support utmp/wtmp file (track who login/logout)
+# CONFIG_BUSYBOX_CONFIG_FEATURE_UTMP=y
+# CONFIG_BUSYBOX_CONFIG_FEATURE_WTMP=y
+# #### Include busybox applet, Support "--show SCRIPT" and "--install [-s] to install applet links at runtime"
+# CONFIG_BUSYBOX_CONFIG_BUSYBOX=y
+# CONFIG_BUSYBOX_CONFIG_FEATURE_SHOW_SCRIPT=y
+# CONFIG_BUSYBOX_CONFIG_FEATURE_INSTALLER=y
+# #### Drop SUID state for most applets, Enable SUID configuration via /etc/busybox.conf
+# CONFIG_BUSYBOX_CONFIG_FEATURE_SUID=y
+# CONFIG_BUSYBOX_CONFIG_FEATURE_SUID_CONFIG=y
+# #### Support LOG_INFO level syslog messages
+# CONFIG_BUSYBOX_CONFIG_FEATURE_SYSLOG_INFO=y
+# #### Reverse history search
+# CONFIG_BUSYBOX_CONFIG_FEATURE_REVERSE_SEARCH=y
+# #### Query cursor position from terminal
+# CONFIG_BUSYBOX_CONFIG_FEATURE_EDITING_ASK_TERMINAL=y
+# #### Enable automatic tracking of window size changes
+# CONFIG_BUSYBOX_CONFIG_FEATURE_EDITING_WINCH=y
 
 ## Enable zram swap (zswap)
 CONFIG_PACKAGE_zram-swap=y
