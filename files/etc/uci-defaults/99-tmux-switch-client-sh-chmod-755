@@ -1,0 +1,3 @@
+#!/bin/sh
+# Auto add execute permission to /etc/tmux.switch-client.sh (tmux.conf calls this without "bash" prefix)
+[ -f "/etc/tmux.switch-client.sh" ] && chmod 755 "/etc/tmux.switch-client.sh"

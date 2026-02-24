@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Remove "/usr/bin/zsh" placed at the last line of /etc/profile. Who f**king places the shit?
 #sed -i.bak '/^\/usr\/bin\/zsh/d' /etc/profile
 for i in 1 2 3 4 5 6 7 8 9 10; do if ! grep "/usr/bin/zsh" /etc/profile >/dev/null 2>&1; then sleep 1; fi; done

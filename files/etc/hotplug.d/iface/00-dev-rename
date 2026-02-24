@@ -1,0 +1,18 @@
+
+# 2026-02-24 https://openwrt.org/docs/guide-user/base-system/hotplug#rename_interfaces_by_mac_address
+dev_rename() {
+    local DEV_CONF="${1}"
+    local DEV_MAC DEV_NAME DEV_ONAME
+    config_get DEV_MAC "${DEV_CONF}" mac
+    config_get DEV_NAME "${DEV_CONF}" name
+    DEV_ONAME="$(grep -l -e "${DEV_MAC}" \
+        $(find /sys/class/net/*/device/uevent \
+        | sed -e "s|/device/uevent$|/address|") \
+        | awk -F '/' '{print $5}')"
+    if [ -n "${DEV_MAC}" ] && [ "${DEV_ONAME}" != "${DEV_NAME}" ]; then
+        ip link set "${DEV_ONAME}" name "${DEV_NAME}"
+    fi
+}
+. /lib/functions.sh
+config_load network
+config_foreach dev_rename device
