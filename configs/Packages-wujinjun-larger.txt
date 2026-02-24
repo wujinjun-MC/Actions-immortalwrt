@@ -266,7 +266,8 @@ CONFIG_PACKAGE_ddns-scripts-cloudflare=y
 CONFIG_PACKAGE_ddns-scripts-noip=y
 CONFIG_PACKAGE_ddns-scripts-utils=y
 #CONFIG_PACKAGE_dhtd=y
-CONFIG_PACKAGE_dns-over-https=y
+# 与 dnsmasq, odhcpd 等 DHCP 服务冲突，无法获取 IP 地址
+#CONFIG_PACKAGE_dns-over-https=y
 CONFIG_PACKAGE_dns2socks=y
 CONFIG_PACKAGE_dns2tcp=y
 CONFIG_PACKAGE_dnsdist-full=y
