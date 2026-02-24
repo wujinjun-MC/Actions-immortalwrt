@@ -69,6 +69,13 @@ rm -f "$OPENWRT_PATH/.config"
 #echo "export CONFIG_WUJINJUN_OTHERS=configs/Others-wujinjun.txt" >> "$SHARED_ENV"
 [ -f $PLATFORM_FILE ] && cat $PLATFORM_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_FILE ] && cat $CONFIG_FILE >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN ] && cat $CONFIG_WUJINJUN >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_OTHERS ] && cat $CONFIG_WUJINJUN_OTHERS >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_LARGER ] && cat $CONFIG_WUJINJUN_LARGER >> "$OPENWRT_PATH/.config"; [ -f $CONFIG_WUJINJUN_BUSYBOX ] && cat $CONFIG_WUJINJUN_BUSYBOX >> "$OPENWRT_PATH/.config"
 
+echo "默认开启 ccache 和 sccache (Rust ccache)"
+grep -q "CONFIG_CCACHE=y" "$OPENWRT_PATH/.config" || echo "CONFIG_CCACHE=y" >> "$OPENWRT_PATH/.config"
+grep -q "CONFIG_RUST_SCCACHE=y" "$OPENWRT_PATH/.config" || echo "CONFIG_RUST_SCCACHE=y" >> "$OPENWRT_PATH/.config"
+
+echo "开启 squashfs 镜像 (本地构建的存储空间足够)"
+grep -q "CONFIG_TARGET_ROOTFS_SQUASHFS=n" "$OPENWRT_PATH/.config" && sed -i.bak "s/CONFIG_TARGET_ROOTFS_SQUASHFS=n/CONFIG_TARGET_ROOTFS_SQUASHFS=y/g" "$OPENWRT_PATH/.config"
+
 chmod +x $RUST_SH && $RUST_SH
 cd "$OPENWRT_PATH"
 echo "执行 $GITHUB_WORKSPACE/$SETTINGS_SH"
@@ -87,9 +94,5 @@ ln "$OPENWRT_PATH/.config" "$OPENWRT_PATH/files/etc/build.config"
 
 chmod +x $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh && $GITHUB_WORKSPACE/overwrite/overwrite-after-feeds-download.sh
 chmod +x $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh && $GITHUB_WORKSPACE/patch/patch-after-feeds-download.sh
-
-echo "默认开启 ccache 和 sccache (Rust ccache)"
-grep -q "CONFIG_CCACHE=y" .config || echo "CONFIG_CCACHE=y" >> .config
-grep -q "CONFIG_RUST_SCCACHE=y" .config || echo "CONFIG_RUST_SCCACHE=y" >> .config
 
 echo "01-prepare-env.sh success"

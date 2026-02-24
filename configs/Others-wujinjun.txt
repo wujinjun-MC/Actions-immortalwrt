@@ -2,16 +2,16 @@
 
 # 1. Target Images
 
-# 开启 ramdisk ，使用 gzip 压缩 (不再开启，用不到，因为不是 rootfs)
-#CONFIG_TARGET_ROOTFS_INITRAMFS=y
-#CONFIG_TARGET_INITRAMFS_COMPRESSION_GZIP=y
+# 开启 ramdisk ，使用 gzip 压缩
+CONFIG_TARGET_ROOTFS_INITRAMFS=y
+CONFIG_TARGET_INITRAMFS_COMPRESSION_GZIP=y
 
 # 开启 ext4 镜像，关闭 squashfs 镜像
 CONFIG_TARGET_ROOTFS_EXT4FS=y
 CONFIG_TARGET_ROOTFS_SQUASHFS=n
 
-# Bye, tar.gz
-#CONFIG_TARGET_ROOTFS_TARGZ=n
+# Bye, *-targz-* (不是 rootfs)
+CONFIG_TARGET_ROOTFS_TARGZ=n
 
 # 来点缓冲
 CONFIG_GRUB_TIMEOUT="5"
