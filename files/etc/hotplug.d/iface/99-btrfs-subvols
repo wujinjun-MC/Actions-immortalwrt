@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Btrfs 子卷自动挂载工具
+# 请进行修改，然后移除 `exit 0`
+exit 0
+
+# 先去挂载点设置中设置一个 "根子卷"，可以是 subvol=/ 或 subvol=@ ，用于判断是否准备好挂载
+
+# 这里的 UUID 替换为你硬盘分区的真实 UUID
+TARGET_UUID="你的-UUID-在这里"
+# 主挂载点（父卷）
+PARENT_MOUNT="/share/disk1"
+
+# 检查当前事件是否为挂载 (mount)
+if [ "$ACTION" = "add" ] || [ "$ACTION" = "change" ]; then
+    # 等待几秒确保主分区挂载动作完成
+    sleep 2
+    
+    # 检查主挂载点是否已经在线
+    for i in $(seq 1 10); do
+        if mountpoint -q "$PARENT_MOUNT"; then
+            logger -t BTRFS_MOUNT "Detected $PARENT_MOUNT is up, starting subvolumes..."
+
+            # 挂载子卷 1
+            subvol_path=/share/subvol_data
+            if [ ! -d "$subvol_path" ]; then mkdir -p "$subvol_path"; fi
+            mount UUID="$TARGET_UUID" -t btrfs -o subvol=@data,compress=zstd "$subvol_path"
+
+            # 挂载子卷 2
+            subvol_path=/share/subvol_data2
+            if [ ! -d "$subvol_path" ]; then mkdir -p "$subvol_path"; fi
+            mount UUID="$TARGET_UUID" -t btrfs -o subvol=@data,compress=zstd "$subvol_path"
+
+            logger -t BTRFS_MOUNT "All subvolumes mounted successfully."
+        fi
+        sleep 2
+    done
+fi
+
+# 处理卸载逻辑（可选）
+if [ "$ACTION" = "remove" ]; then
+    umount -l /share/subvol_data
+    umount -l /share/subvol_docker
+    logger -t BTRFS_MOUNT "Subvolumes unmounted due to device removal."
+fi
