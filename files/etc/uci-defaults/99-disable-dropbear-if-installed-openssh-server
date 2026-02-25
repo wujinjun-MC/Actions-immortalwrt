@@ -1,0 +1,4 @@
+#!/bin/sh
+[ -f /etc/init.d/sshd ] && /etc/init.d/sshd running && /etc/init.d/dropbear stop && /etc/init.d/dropbear disable
+echo "sshd (openssh-server) status: $(/etc/init.d/sshd status)" >> /tmp/ssh-server-status
+echo "dropbear status: $(/etc/init.d/dropbear status)" >> /tmp/ssh-server-status
