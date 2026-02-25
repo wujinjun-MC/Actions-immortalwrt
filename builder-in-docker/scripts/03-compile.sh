@@ -107,6 +107,8 @@ echo >> "$OPENWRT_PATH/build-log-nocolor.log"
 
 # Alternative: 自动反复重试
 #cd "$OPENWRT_PATH"; make defconfig clean; while ! time nice -n 10 unbuffer make -j8 V=s 2>&1 | tee -a /dev/tty 2>&1 | tee -a "$OPENWRT_PATH/build-log-color.log" 2>&1 | ansi2txt >> "$OPENWRT_PATH/build-log-nocolor.log" 2>&1 ; do make clean; sleep 60 ; done
+## 如果自动重试，不想 `make clean` 但遇到问题
+#make package/firmware/intel-microcode/clean package/feeds/packages/sendmail/clean
 
 # 编译结果位于 bin/targets
 ls bin/targets/*/*
