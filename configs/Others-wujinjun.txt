@@ -6,12 +6,11 @@
 CONFIG_TARGET_ROOTFS_INITRAMFS=y
 CONFIG_TARGET_INITRAMFS_COMPRESSION_GZIP=y
 
-# 开启 ext4 镜像，关闭 squashfs 镜像
+# 开启 ext4,squashfs 镜像
 CONFIG_TARGET_ROOTFS_EXT4FS=y
-CONFIG_TARGET_ROOTFS_SQUASHFS=n
+CONFIG_TARGET_ROOTFS_SQUASHFS=y
 
-# Bye, *-targz-* (不是 rootfs)
-CONFIG_TARGET_ROOTFS_TARGZ=n
+CONFIG_TARGET_ROOTFS_TARGZ=y
 
 # 来点缓冲
 CONFIG_GRUB_TIMEOUT="5"
@@ -33,6 +32,7 @@ CONFIG_VMDK_IMAGES=n
 
 # /var 持久化
 ## ~~已禁用: 导致功能异常 (例如挂载点修改后，系统找不到 fstab, mtab 需要重启才能恢复正常)~~ 是 `blockd` (依赖 by `ksmbd-hotplug`) 导致的
+## 已禁用: 减少硬盘读写
 #CONFIG_TARGET_ROOTFS_PERSIST_VAR=y
 
 # 1.1 Kernel build options
