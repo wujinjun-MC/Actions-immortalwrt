@@ -32,7 +32,7 @@ CONFIG_VMDK_IMAGES=n
 #CONFIG_VHDX_IMAGES=y
 
 # /var 持久化
-## 已禁用: 导致功能异常 (例如挂载点修改后，系统找不到 fstab, mtab 需要重启才能恢复正常)
+## ~~已禁用: 导致功能异常 (例如挂载点修改后，系统找不到 fstab, mtab 需要重启才能恢复正常)~~ 是 `blockd` (依赖 by `ksmbd-hotplug`) 导致的
 #CONFIG_TARGET_ROOTFS_PERSIST_VAR=y
 
 # 1.1 Kernel build options
