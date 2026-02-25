@@ -9,7 +9,12 @@ exit 0
 # 这里的 UUID 替换为你硬盘分区的真实 UUID
 TARGET_UUID="你的-UUID-在这里"
 # 主挂载点（父卷）
-PARENT_MOUNT="/share/disk1"
+PARENT_MOUNT="/mnt/disk1"
+FIRST_MOUNT="/share/subvol_data"
+if mountpoint "$FIRST_MOUNT"; then
+    echo "This btrfs disk is already mounted"
+    exit 0
+fi
 
 # 检查当前事件是否为挂载 (mount)
 if [ "$ACTION" = "add" ] || [ "$ACTION" = "change" ]; then
@@ -22,7 +27,7 @@ if [ "$ACTION" = "add" ] || [ "$ACTION" = "change" ]; then
             logger -t BTRFS_MOUNT "Detected $PARENT_MOUNT is up, starting subvolumes..."
 
             # 挂载子卷 1
-            subvol_path=/share/subvol_data
+            subvol_path="$FIRST_MOUNT"
             if [ ! -d "$subvol_path" ]; then mkdir -p "$subvol_path"; fi
             mount UUID="$TARGET_UUID" -t btrfs -o subvol=@data,compress=zstd "$subvol_path"
 
